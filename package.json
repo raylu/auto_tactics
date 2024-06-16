@@ -1,0 +1,12 @@
+{
+  "name": "auto_tactics",
+  "devDependencies": {
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "build": "bun build --outdir static --sourcemap=external --splitting ts/index.ts",
+    "watch": "bun run build --watch"
+  }
+}
