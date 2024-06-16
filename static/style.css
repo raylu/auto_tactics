@@ -1,0 +1,26 @@
+* {
+	box-sizing: border-box;
+}
+
+body {
+	background-color: #000;
+	color: #aaa;
+	font: 18px Metrophobic, sans-serif;
+}
+
+a:link, a:visited, a:active {
+	color: #58a;
+	text-decoration: none;
+}
+a:hover {
+	color: #5ad;
+}
+
+footer {
+	width: 900px;
+	margin: 1em auto 100px;
+	text-align: right;
+}
+footer img {
+	height: 32px;
+}
