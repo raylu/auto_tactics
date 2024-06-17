@@ -7,7 +7,7 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "build": "bun build --outdir static --sourcemap=external --splitting ts/index.ts",
+    "build": "bun build --outdir static --sourcemap=external --splitting frontend/index.ts",
     "watch": "bun run build --watch"
   }
 }
