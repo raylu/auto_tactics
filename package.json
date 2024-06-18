@@ -15,6 +15,7 @@
     "lint": "tsc && eslint"
   },
   "dependencies": {
+    "@excaliburjs/plugin-jsfxr": "^0.29.4",
     "excalibur": "^0.29.3"
   }
 }

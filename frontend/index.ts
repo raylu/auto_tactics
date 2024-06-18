@@ -1,18 +1,29 @@
 import {score} from '../shared/score';
-import {Actor, Color, Engine} from 'excalibur';
+import {sounds} from './sounds';
+import {JsfxrResource} from '@excaliburjs/plugin-jsfxr';
+import {Color, Engine, ScreenElement} from 'excalibur';
 
 const game = new Engine({
 	canvasElement: document.querySelector('canvas#game') as HTMLCanvasElement,
 	width: 600,
 	height: 400,
 });
-const paddle = new Actor({
-	x: 150,
-	y: game.drawHeight - 40,
-	width: 200,
-	height: 20,
-	color: Color.Chartreuse,
+
+const sndPlugin = new JsfxrResource();
+void sndPlugin.init();
+for (const sound in sounds)
+	sndPlugin.loadSoundConfig(sound, sounds[sound]);
+
+const button = new ScreenElement({
+	x: game.drawWidth / 2,
+	y: game.drawHeight - 80,
+	width: 100,
+	height: 40,
+	color: Color.Vermilion,
 });
-game.add(paddle);
+button.on('pointerup', () => {
+	sndPlugin.playSound('hit');
+});
+game.add(button);
 
 void game.start();
