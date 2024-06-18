@@ -13,5 +13,8 @@
     "build": "bun build --outdir static --sourcemap=external --splitting frontend/index.ts",
     "watch": "bun run build --watch",
     "lint": "tsc && eslint"
+  },
+  "dependencies": {
+    "excalibur": "^0.29.3"
   }
 }

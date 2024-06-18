@@ -6,7 +6,6 @@ const configs = [
 	eslint.configs.recommended,
 	...tseslint.configs.recommendedTypeChecked,
 	{
-		name: 'raylu',
 		languageOptions: {
 			globals: globals.browser,
 			parserOptions: {
@@ -17,6 +16,7 @@ const configs = [
 		rules: {
 			'linebreak-style': ['error', 'unix'],
 			'camelcase': ['error'],
+			'comma-dangle': ['error', {'arrays': 'always-multiline', 'objects': 'always-multiline'}],
 			'prefer-const': ['error', {'destructuring': 'all'}],
 			'quotes': ['error', 'single'],
 			'semi': ['error', 'always'],

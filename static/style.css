@@ -16,9 +16,14 @@ a:hover {
 	color: #5ad;
 }
 
+canvas#game {
+	display: block;
+	margin: 40px auto;
+}
+
 footer {
-	width: 900px;
-	margin: 1em auto 100px;
+	width: 600px;
+	margin: 100px auto;
 	text-align: right;
 }
 footer img {
