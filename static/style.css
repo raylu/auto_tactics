@@ -21,11 +21,17 @@ canvas#game {
 	margin: 40px auto;
 }
 
-footer {
+main, footer {
 	width: 600px;
 	margin: 100px auto;
-	text-align: right;
 }
-footer img {
+main a {
+	display: block;
+	margin-bottom: 1em;
+}
+main img {
 	height: 32px;
+}
+footer {
+	text-align: right;
 }

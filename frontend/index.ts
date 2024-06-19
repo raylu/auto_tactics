@@ -1,7 +1,8 @@
 import {score} from '../shared/score';
 import {sounds} from './sounds';
 import {JsfxrResource} from '@excaliburjs/plugin-jsfxr';
-import {Color, Engine, Font, Label, ScreenElement, vec} from 'excalibur';
+import {Actor, Color, Engine, Font, Label, ScreenElement, vec} from 'excalibur';
+import {blueWitchIdle} from './sprites';
 
 const game = new Engine({
 	canvasElement: document.querySelector('canvas#game') as HTMLCanvasElement,
@@ -14,6 +15,12 @@ const sndPlugin = new JsfxrResource();
 void sndPlugin.init();
 for (const sound in sounds)
 	sndPlugin.loadSoundConfig(sound, sounds[sound]);
+
+const blueWitch = new Actor({
+	pos: vec(100, 100),
+});
+blueWitch.graphics.use(blueWitchIdle);
+game.add(blueWitch);
 
 const scoreDisplay = new Label({
 	visible: false,

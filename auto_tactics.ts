@@ -9,6 +9,8 @@ const server = Bun.serve({
 			return new Response(Bun.file('html/index.html'));
 		else if (url.pathname === '/api/score')
 			return new Response(score() + '\n');
+		else if (url.pathname.startsWith('/credits'))
+			return new Response(Bun.file('html/credits.html'));
 		else if (url.pathname.startsWith('/static/'))
 			return new Response(Bun.file(url.pathname.substring(1)));
 		return new Response('404\n', { status: 404 });
