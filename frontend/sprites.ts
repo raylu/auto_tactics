@@ -1,7 +1,6 @@
-import {Animation, ImageSource, SpriteSheet, range} from 'excalibur';
+import {Animation, DefaultLoader, ImageSource, SpriteSheet, range} from 'excalibur';
 
 const blueWitchIdleImg = new ImageSource('static/sprites/blue_witch/idle.png');
-void blueWitchIdleImg.load();
 export const blueWitchIdle = Animation.fromSpriteSheet(SpriteSheet.fromImageSource({
 	image: blueWitchIdleImg,
 	grid: {
@@ -13,7 +12,6 @@ export const blueWitchIdle = Animation.fromSpriteSheet(SpriteSheet.fromImageSour
 }), range(0, 5), 100);
 
 const enemyImg = new ImageSource('static/sprites/enemy.png');
-void enemyImg.load();
 const enemySprites = SpriteSheet.fromImageSource({
 	image: enemyImg,
 	grid: {
@@ -26,7 +24,6 @@ const enemySprites = SpriteSheet.fromImageSource({
 export const enemyIdle = Animation.fromSpriteSheet(enemySprites, range(0, 5), 100);
 
 const terrainGrassImg = new ImageSource('static/sprites/terrain/tileset_grass.png');
-void terrainGrassImg.load();
 export const terrainGrass = SpriteSheet.fromImageSource({
 	image: terrainGrassImg,
 	grid: {
@@ -36,3 +33,6 @@ export const terrainGrass = SpriteSheet.fromImageSource({
 		spriteWidth: 64,
 	},
 });
+
+export const loader = new DefaultLoader();
+loader.addResources([blueWitchIdleImg, enemyImg, terrainGrassImg]);

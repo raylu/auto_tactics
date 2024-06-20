@@ -2,7 +2,7 @@ import {score} from '../shared/score';
 import {sounds} from './sounds';
 import {JsfxrResource} from '@excaliburjs/plugin-jsfxr';
 import {Actor, Color, Engine, Font, Label, Random, ScreenElement, vec} from 'excalibur';
-import {blueWitchIdle, enemyIdle, terrainGrass} from './sprites';
+import {blueWitchIdle, enemyIdle, loader, terrainGrass} from './sprites';
 
 const game = new Engine({
 	canvasElement: document.querySelector('canvas#game') as HTMLCanvasElement,
@@ -64,4 +64,4 @@ button.on('pointerup', () => {
 });
 game.add(button);
 
-void game.start();
+void game.start(loader);
