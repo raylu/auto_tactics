@@ -24,3 +24,15 @@ const enemySprites = SpriteSheet.fromImageSource({
 	},
 });
 export const enemyIdle = Animation.fromSpriteSheet(enemySprites, range(0, 5), 100);
+
+const terrainGrassImg = new ImageSource('static/sprites/terrain/tileset_grass.png');
+void terrainGrassImg.load();
+export const terrainGrass = SpriteSheet.fromImageSource({
+	image: terrainGrassImg,
+	grid: {
+		rows: 4,
+		columns: 4,
+		spriteHeight: 64,
+		spriteWidth: 64,
+	},
+});
