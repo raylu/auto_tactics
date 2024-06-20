@@ -34,5 +34,16 @@ export const terrainGrass = SpriteSheet.fromImageSource({
 	},
 });
 
+const spellIconsImg = new ImageSource('static/sprites/spell_icons.gif');
+export const spellIcons = SpriteSheet.fromImageSource({
+	image: spellIconsImg,
+	grid: {
+		rows: 6,
+		columns: 9,
+		spriteHeight: 16,
+		spriteWidth: 16,
+	},
+});
+
 export const loader = new DefaultLoader();
-loader.addResources([blueWitchIdleImg, enemyImg, terrainGrassImg]);
+loader.addResources([blueWitchIdleImg, enemyImg, terrainGrassImg, spellIconsImg]);

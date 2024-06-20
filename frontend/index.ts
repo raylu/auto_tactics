@@ -2,7 +2,7 @@ import {score} from '../shared/score';
 import {sounds} from './sounds';
 import {JsfxrResource} from '@excaliburjs/plugin-jsfxr';
 import {Actor, Color, Engine, Font, Label, Random, ScreenElement, vec} from 'excalibur';
-import {blueWitchIdle, enemyIdle, loader, terrainGrass} from './sprites';
+import {blueWitchIdle, enemyIdle, loader, spellIcons, terrainGrass} from './sprites';
 
 const game = new Engine({
 	canvasElement: document.querySelector('canvas#game') as HTMLCanvasElement,
@@ -49,8 +49,23 @@ const scoreDisplay = new Label({
 });
 game.add(scoreDisplay);
 
+const spell1 = new ScreenElement({
+	x: 80,
+	y: game.drawHeight - 120,
+	scale: vec(2, 2),
+});
+spell1.graphics.use(spellIcons.getSprite(3, 2));
+game.add(spell1);
+const spell2 = new ScreenElement({
+	x: 120,
+	y: game.drawHeight - 120,
+	scale: vec(2, 2),
+});
+spell2.graphics.use(spellIcons.getSprite(4, 1));
+game.add(spell2);
+
 const button = new ScreenElement({
-	x: game.drawWidth / 2,
+	x: 400,
 	y: game.drawHeight - 80,
 	width: 100,
 	height: 40,
