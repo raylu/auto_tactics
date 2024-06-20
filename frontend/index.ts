@@ -6,9 +6,9 @@ import {blueWitchIdle, enemyIdle, terrainGrass} from './sprites';
 
 const game = new Engine({
 	canvasElement: document.querySelector('canvas#game') as HTMLCanvasElement,
-	width: 600,
-	height: 400,
-	backgroundColor: Color.fromHSL(0.15, 0.50, 0.20),
+	width: 640,
+	height: 640,
+	backgroundColor: Color.fromRGB(50, 0, 50),
 	pixelArt: true,
 	suppressConsoleBootMessage: true,
 });
@@ -20,8 +20,8 @@ for (const sound in sounds)
 
 const referenceGrassSprite = terrainGrass.getSprite(0, 0);
 const random = new Random();
-for (let x = 0; x < game.drawWidth / referenceGrassSprite.width; x++) {
-	for (let y = 0; y < game.drawHeight / referenceGrassSprite.height; y++) {
+for (let x = 0; x <= game.drawWidth / referenceGrassSprite.width; x++) {
+	for (let y = 0; y <= 448 / referenceGrassSprite.height; y++) {
 		const background = new Actor({pos: vec(referenceGrassSprite.width * x, referenceGrassSprite.height * y)});
 		background.graphics.use(terrainGrass.getSprite(random.integer(0, 3), random.integer(0, 1)));
 		game.add(background);
@@ -35,7 +35,7 @@ blueWitch.graphics.use(blueWitchIdle);
 game.add(blueWitch);
 
 const enemy = new Actor({
-	pos: vec(450, 150),
+	pos: vec(500, 150),
 	scale: vec(2, 2),
 });
 enemy.graphics.use(enemyIdle);
@@ -44,7 +44,7 @@ game.add(enemy);
 
 const scoreDisplay = new Label({
 	visible: false,
-	pos: vec(game.drawWidth - 15, 10),
+	pos: vec(game.drawWidth - 10, 10),
 	font: new Font({size: 24}),
 });
 game.add(scoreDisplay);
@@ -59,7 +59,7 @@ const button = new ScreenElement({
 button.on('pointerup', () => {
 	sndPlugin.playSound('hit');
 	scoreDisplay.text = String(score());
-	scoreDisplay.pos.x = game.drawWidth - 15 * scoreDisplay.text.length;
+	scoreDisplay.pos.x = game.drawWidth - 10 - scoreDisplay.text.length * 15;
 	scoreDisplay.graphics.visible = true;
 });
 game.add(button);

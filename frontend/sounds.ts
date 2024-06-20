@@ -32,4 +32,4 @@ export const sounds: {[key: string]: SoundConfig} = {
 		sample_rate: 44100,
 		sample_size: 8,
 	},
-};
+} as const;
