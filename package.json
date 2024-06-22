@@ -10,7 +10,7 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "build": "bun build --outdir static --sourcemap=external --splitting frontend/index.ts",
+    "build": "bun build --outdir static --sourcemap=linked --splitting frontend/index.ts",
     "watch": "bun run build --watch",
     "lint": "tsc && eslint"
   },

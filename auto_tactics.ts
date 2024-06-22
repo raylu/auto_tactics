@@ -15,10 +15,7 @@ const server = Bun.serve({
 			const file = Bun.file(url.pathname.substring(1));
 			if (!await file.exists())
 				return new Response('404\n', {status: 404});
-			const headers: Record<string, string> = {};
-			if (url.pathname.endsWith('.js'))
-				headers['SourceMap'] = url.pathname + '.map';
-			return new Response(file, {headers});
+			return new Response(file);
 		}
 		return new Response('404\n', {status: 404});
 	},
