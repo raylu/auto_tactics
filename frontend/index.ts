@@ -1,7 +1,7 @@
 import {score} from '../shared/score';
 import {sounds} from './sounds';
 import {JsfxrResource} from '@excaliburjs/plugin-jsfxr';
-import {Actor, Color, Engine, Font, Label, Random, ScreenElement, vec} from 'excalibur';
+import {Actor, Color, Engine, Font, Label, Random, ScreenElement, TileMap, vec} from 'excalibur';
 import {blueWitchIdle, enemyIdle, loader, spellIcons, terrainGrass} from './sprites';
 
 const game = new Engine({
@@ -19,14 +19,16 @@ for (const sound in sounds)
 	sndPlugin.loadSoundConfig(sound, sounds[sound]);
 
 const referenceGrassSprite = terrainGrass.getSprite(0, 0);
+const background = new TileMap({
+	rows: 448 / referenceGrassSprite.height,
+	columns: game.drawWidth / referenceGrassSprite.width,
+	tileHeight: referenceGrassSprite.height,
+	tileWidth: referenceGrassSprite.width,
+});
 const random = new Random();
-for (let x = 0; x <= game.drawWidth / referenceGrassSprite.width; x++) {
-	for (let y = 0; y <= 448 / referenceGrassSprite.height; y++) {
-		const background = new Actor({pos: vec(referenceGrassSprite.width * x, referenceGrassSprite.height * y)});
-		background.graphics.use(terrainGrass.getSprite(random.integer(0, 3), random.integer(0, 1)));
-		game.add(background);
-	}
-}
+for (const tile of background.tiles)
+	tile.addGraphic(terrainGrass.getSprite(random.integer(0, 3), random.integer(0, 1)));
+game.add(background);
 
 const blueWitch = new Actor({
 	pos: vec(100, 150),
