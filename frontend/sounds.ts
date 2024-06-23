@@ -1,6 +1,8 @@
 /* eslint-disable camelcase */
 
 import type {SoundConfig} from '@excaliburjs/plugin-jsfxr';
+import {Sound} from 'excalibur';
+import {loader} from './loader';
 
 export const sounds: {[key: string]: SoundConfig} = {
 	'hit': {
@@ -33,3 +35,7 @@ export const sounds: {[key: string]: SoundConfig} = {
 		sample_size: 8,
 	},
 } as const;
+
+export const iceSound = new Sound('static/audio/ice.m4a');
+
+loader.addResource(iceSound);

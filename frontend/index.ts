@@ -1,9 +1,10 @@
 import {score} from '../shared/score';
-import {sounds} from './sounds';
+import {iceSound, sounds} from './sounds';
 import {JsfxrResource} from '@excaliburjs/plugin-jsfxr';
 import {ActionCompleteEvent, ActionContext, ActionSequence, Actor, Color, Engine, Font, Label, MoveTo, Random,
 	ScreenElement, TileMap, vec} from 'excalibur';
-import {enemyAnims, iceBlastAnims, loader, spellIcons, terrainGrass, witchAnims} from './sprites';
+import {enemyAnims, iceBlastAnims, spellIcons, terrainGrass, witchAnims} from './sprites';
+import {loader} from './loader';
 
 const game = new Engine({
 	canvasElement: document.querySelector('canvas#game') as HTMLCanvasElement,
@@ -33,6 +34,7 @@ game.add(background);
 
 const blueWitch = new Actor({
 	pos: vec(100, 150),
+	scale: vec(1.5, 1.5),
 });
 blueWitch.graphics.use(witchAnims.idle);
 game.add(blueWitch);
@@ -95,7 +97,7 @@ const button = new ScreenElement({
 });
 button.on('pointerup', () => {
 	let playerTurn = true;
-	setInterval(() => {
+	const interval = setInterval(() => {
 		if (playerTurn) {
 			blueWitch.graphics.use(witchAnims.charge);
 			const iceBlast = new Actor({
@@ -109,8 +111,14 @@ button.on('pointerup', () => {
 			game.add(iceBlast);
 			iceBlast.actions.meet(enemy, 600);
 			iceBlast.events.on('actioncomplete', () => {
+				iceBlastAnims.impact.reset();
+				iceBlast.graphics.use(iceBlastAnims.impact);
+				blueWitch.graphics.use(witchAnims.idle);
+			});
+			iceBlastAnims.impact.events.once('end', () => {
 				iceBlast.kill();
 			});
+			void iceSound.play();
 		} else {
 			blueWitch.graphics.use(witchAnims.idle);
 			enemyAnims.attack.reset();
@@ -120,9 +128,12 @@ button.on('pointerup', () => {
 		playerTurn = !playerTurn;
 	}, 1500);
 
-	scoreDisplay.text = String(score());
-	scoreDisplay.pos.x = game.drawWidth - 10 - scoreDisplay.text.length * 15;
-	scoreDisplay.graphics.visible = true;
+	setTimeout(() => {
+		clearInterval(interval);
+		scoreDisplay.text = String(score());
+		scoreDisplay.pos.x = game.drawWidth - 10 - scoreDisplay.text.length * 15;
+		scoreDisplay.graphics.visible = true;
+	}, 6000);
 });
 game.add(button);
 

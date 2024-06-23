@@ -1,4 +1,5 @@
-import {Animation, AnimationStrategy, DefaultLoader, ImageSource, SpriteSheet, range, type Loadable} from 'excalibur';
+import {Animation, AnimationStrategy, ImageSource, SpriteSheet, range, type Loadable} from 'excalibur';
+import {loader} from './loader';
 
 const resources: Loadable<any>[] = [];
 
@@ -68,10 +69,20 @@ const iceBlastProjectile = SpriteSheet.fromImageSource({
 		spriteWidth: 64,
 	},
 });
+const iceBlastImpactImg = new ImageSource('static/sprites/ice_blast/impact.png');
+const iceBlastImpact = SpriteSheet.fromImageSource({
+	image: iceBlastImpactImg,
+	grid: {
+		rows: 4,
+		columns: 4,
+		spriteHeight: 64,
+		spriteWidth: 64,
+	},
+});
 export const iceBlastAnims = {
 	startup: Animation.fromSpriteSheet(iceBlastProjectile, range(0, 3), 100, AnimationStrategy.Freeze),
 	projectile: Animation.fromSpriteSheet(iceBlastProjectile, range(4, 20), 100),
+	impact: Animation.fromSpriteSheet(iceBlastImpact, range(0, 14), 50, AnimationStrategy.Freeze),
 } as const;
 
-export const loader = new DefaultLoader();
-loader.addResources([...resources, enemyImg, terrainGrassImg, spellIconsImg, iceBlastProjectileImg]);
+loader.addResources([...resources, enemyImg, terrainGrassImg, spellIconsImg, iceBlastProjectileImg, iceBlastImpactImg]);
