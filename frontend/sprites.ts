@@ -1,8 +1,8 @@
-import {Animation, DefaultLoader, ImageSource, SpriteSheet, range, type Loadable} from 'excalibur';
+import {Animation, AnimationStrategy, DefaultLoader, ImageSource, SpriteSheet, range, type Loadable} from 'excalibur';
 
 const resources: Loadable<any>[] = [];
 
-function witchAnimation(name: string, rows: number, width: number) {
+function witchAnimation(name: string, rows: number, width: number, strategy?: AnimationStrategy) {
 	const image = new ImageSource(`static/sprites/blue_witch/${name}.png`);
 	resources.push(image);
 	return Animation.fromSpriteSheet(SpriteSheet.fromImageSource({
@@ -13,12 +13,12 @@ function witchAnimation(name: string, rows: number, width: number) {
 			spriteHeight: 48,
 			spriteWidth: width,
 		},
-	}), range(0, rows - 1), 100);
+	}), range(0, rows - 1), 100, strategy);
 }
-export const witch = {
+export const witchAnims = {
 	idle: witchAnimation('idle', 6, 32),
 	charge: witchAnimation('charge', 5, 48),
-	takeDamage: witchAnimation('take_damage', 3, 32),
+	takeDamage: witchAnimation('take_damage', 3, 32, AnimationStrategy.Freeze),
 } as const;
 
 const enemyImg = new ImageSource('static/sprites/enemy.png');
@@ -31,7 +31,10 @@ const enemySprites = SpriteSheet.fromImageSource({
 		spriteWidth: 69,
 	},
 });
-export const enemyIdle = Animation.fromSpriteSheet(enemySprites, range(0, 5), 100);
+export const enemyAnims = {
+	idle: Animation.fromSpriteSheet(enemySprites, range(0, 5), 100),
+	attack: Animation.fromSpriteSheet(enemySprites, range(6, 25), 50, AnimationStrategy.Freeze),
+} as const;
 
 const terrainGrassImg = new ImageSource('static/sprites/terrain/tileset_grass.png');
 export const terrainGrass = SpriteSheet.fromImageSource({

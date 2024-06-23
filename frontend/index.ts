@@ -1,8 +1,9 @@
 import {score} from '../shared/score';
 import {sounds} from './sounds';
 import {JsfxrResource} from '@excaliburjs/plugin-jsfxr';
-import {Actor, Color, Engine, Font, Label, Random, ScreenElement, TileMap, vec} from 'excalibur';
-import {witch, enemyIdle, loader, spellIcons, terrainGrass} from './sprites';
+import {ActionCompleteEvent, ActionContext, ActionSequence, Actor, Color, Engine, Font, Label, MoveTo, Random,
+	ScreenElement, TileMap, vec} from 'excalibur';
+import {enemyAnims, loader, spellIcons, terrainGrass, witchAnims} from './sprites';
 
 const game = new Engine({
 	canvasElement: document.querySelector('canvas#game') as HTMLCanvasElement,
@@ -33,16 +34,35 @@ game.add(background);
 const blueWitch = new Actor({
 	pos: vec(100, 150),
 });
-blueWitch.graphics.use(witch.idle);
+blueWitch.graphics.use(witchAnims.idle);
 game.add(blueWitch);
+witchAnims.takeDamage.events.on('end', () => {
+	blueWitch.graphics.use(witchAnims.idle);
+});
 
+const ENEMY_START = vec(500, 150);
+const ENEMY_ATTACK_POS = vec(blueWitch.pos.x + 40, blueWitch.pos.y);
 const enemy = new Actor({
-	pos: vec(500, 150),
+	pos: ENEMY_START,
 	scale: vec(2, 2),
 });
-enemy.graphics.use(enemyIdle);
+enemy.graphics.use(enemyAnims.idle);
 enemy.graphics.flipHorizontal = true;
 game.add(enemy);
+const enemyAttack = new ActionSequence(enemy, (ctx: ActionContext) => {
+	ctx.moveTo(ENEMY_ATTACK_POS, 1000).delay(700).moveTo(ENEMY_START, 2000);
+});
+enemy.events.on('actioncomplete', (event: ActionCompleteEvent) => {
+	if (event.action instanceof ActionSequence)
+		enemy.graphics.use(enemyAnims.idle);
+	else if (event.action instanceof MoveTo && enemy.pos.equals(ENEMY_ATTACK_POS)) {
+		setTimeout(() => {
+			sndPlugin.playSound('hit');
+			witchAnims.takeDamage.reset();
+			blueWitch.graphics.use(witchAnims.takeDamage);
+		}, 200);
+	}
+});
 
 const scoreDisplay = new Label({
 	visible: false,
@@ -74,8 +94,12 @@ const button = new ScreenElement({
 	color: Color.Vermilion,
 });
 button.on('pointerup', () => {
-	blueWitch.graphics.use(witch.charge);
-	sndPlugin.playSound('hit');
+	blueWitch.graphics.use(witchAnims.charge);
+
+	enemyAnims.attack.reset();
+	enemy.graphics.use(enemyAnims.attack);
+	enemy.actions.runAction(enemyAttack);
+
 	scoreDisplay.text = String(score());
 	scoreDisplay.pos.x = game.drawWidth - 10 - scoreDisplay.text.length * 15;
 	scoreDisplay.graphics.visible = true;
