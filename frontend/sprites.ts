@@ -1,15 +1,25 @@
-import {Animation, DefaultLoader, ImageSource, SpriteSheet, range} from 'excalibur';
+import {Animation, DefaultLoader, ImageSource, SpriteSheet, range, type Loadable} from 'excalibur';
 
-const blueWitchIdleImg = new ImageSource('static/sprites/blue_witch/idle.png');
-export const blueWitchIdle = Animation.fromSpriteSheet(SpriteSheet.fromImageSource({
-	image: blueWitchIdleImg,
-	grid: {
-		rows: 6,
-		columns: 1,
-		spriteHeight: 48,
-		spriteWidth: 32,
-	},
-}), range(0, 5), 100);
+const resources: Loadable<any>[] = [];
+
+function witchAnimation(name: string, rows: number, width: number) {
+	const image = new ImageSource(`static/sprites/blue_witch/${name}.png`);
+	resources.push(image);
+	return Animation.fromSpriteSheet(SpriteSheet.fromImageSource({
+		image,
+		grid: {
+			rows,
+			columns: 1,
+			spriteHeight: 48,
+			spriteWidth: width,
+		},
+	}), range(0, rows - 1), 100);
+}
+export const witch = {
+	idle: witchAnimation('idle', 6, 32),
+	charge: witchAnimation('charge', 5, 48),
+	takeDamage: witchAnimation('take_damage', 3, 32),
+} as const;
 
 const enemyImg = new ImageSource('static/sprites/enemy.png');
 const enemySprites = SpriteSheet.fromImageSource({
@@ -46,4 +56,4 @@ export const spellIcons = SpriteSheet.fromImageSource({
 });
 
 export const loader = new DefaultLoader();
-loader.addResources([blueWitchIdleImg, enemyImg, terrainGrassImg, spellIconsImg]);
+loader.addResources([...resources, enemyImg, terrainGrassImg, spellIconsImg]);

@@ -2,7 +2,7 @@ import {score} from '../shared/score';
 import {sounds} from './sounds';
 import {JsfxrResource} from '@excaliburjs/plugin-jsfxr';
 import {Actor, Color, Engine, Font, Label, Random, ScreenElement, TileMap, vec} from 'excalibur';
-import {blueWitchIdle, enemyIdle, loader, spellIcons, terrainGrass} from './sprites';
+import {witch, enemyIdle, loader, spellIcons, terrainGrass} from './sprites';
 
 const game = new Engine({
 	canvasElement: document.querySelector('canvas#game') as HTMLCanvasElement,
@@ -33,7 +33,7 @@ game.add(background);
 const blueWitch = new Actor({
 	pos: vec(100, 150),
 });
-blueWitch.graphics.use(blueWitchIdle);
+blueWitch.graphics.use(witch.idle);
 game.add(blueWitch);
 
 const enemy = new Actor({
@@ -74,6 +74,7 @@ const button = new ScreenElement({
 	color: Color.Vermilion,
 });
 button.on('pointerup', () => {
+	blueWitch.graphics.use(witch.charge);
 	sndPlugin.playSound('hit');
 	scoreDisplay.text = String(score());
 	scoreDisplay.pos.x = game.drawWidth - 10 - scoreDisplay.text.length * 15;
