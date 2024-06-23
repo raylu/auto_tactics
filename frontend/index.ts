@@ -59,7 +59,7 @@ enemy.events.on('actioncomplete', (event: ActionCompleteEvent) => {
 		enemy.graphics.use(enemyAnims.idle);
 	else if (event.action instanceof MoveTo && enemy.pos.equals(ENEMY_ATTACK_POS)) {
 		setTimeout(() => {
-			sndPlugin.playSound('hit');
+			sndPlugin.playSound('kinetic');
 			witchAnims.takeDamage.reset();
 			blueWitch.graphics.use(witchAnims.takeDamage);
 		}, 200);
@@ -113,12 +113,14 @@ button.on('pointerup', () => {
 			iceBlast.events.on('actioncomplete', () => {
 				iceBlastAnims.impact.reset();
 				iceBlast.graphics.use(iceBlastAnims.impact);
+				sndPlugin.playSound('spell');
+				iceSound.volume = 0.1;
 				blueWitch.graphics.use(witchAnims.idle);
 			});
 			iceBlastAnims.impact.events.once('end', () => {
 				iceBlast.kill();
 			});
-			void iceSound.play();
+			void iceSound.play(0.5);
 		} else {
 			blueWitch.graphics.use(witchAnims.idle);
 			enemyAnims.attack.reset();
