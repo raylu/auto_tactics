@@ -3,7 +3,7 @@ import {sounds} from './sounds';
 import {JsfxrResource} from '@excaliburjs/plugin-jsfxr';
 import {ActionCompleteEvent, ActionContext, ActionSequence, Actor, Color, Engine, Font, Label, MoveTo, Random,
 	ScreenElement, TileMap, vec} from 'excalibur';
-import {enemyAnims, loader, spellIcons, terrainGrass, witchAnims} from './sprites';
+import {enemyAnims, iceBlastAnims, loader, spellIcons, terrainGrass, witchAnims} from './sprites';
 
 const game = new Engine({
 	canvasElement: document.querySelector('canvas#game') as HTMLCanvasElement,
@@ -94,11 +94,31 @@ const button = new ScreenElement({
 	color: Color.Vermilion,
 });
 button.on('pointerup', () => {
-	blueWitch.graphics.use(witchAnims.charge);
-
-	enemyAnims.attack.reset();
-	enemy.graphics.use(enemyAnims.attack);
-	enemy.actions.runAction(enemyAttack);
+	let playerTurn = true;
+	setInterval(() => {
+		if (playerTurn) {
+			blueWitch.graphics.use(witchAnims.charge);
+			const iceBlast = new Actor({
+				pos: blueWitch.pos,
+			});
+			iceBlastAnims.startup.reset();
+			iceBlast.graphics.use(iceBlastAnims.startup);
+			iceBlastAnims.startup.events.once('end', () => {
+				iceBlast.graphics.use(iceBlastAnims.projectile);
+			});
+			game.add(iceBlast);
+			iceBlast.actions.meet(enemy, 600);
+			iceBlast.events.on('actioncomplete', () => {
+				iceBlast.kill();
+			});
+		} else {
+			blueWitch.graphics.use(witchAnims.idle);
+			enemyAnims.attack.reset();
+			enemy.graphics.use(enemyAnims.attack);
+			enemy.actions.runAction(enemyAttack);
+		}
+		playerTurn = !playerTurn;
+	}, 1500);
 
 	scoreDisplay.text = String(score());
 	scoreDisplay.pos.x = game.drawWidth - 10 - scoreDisplay.text.length * 15;

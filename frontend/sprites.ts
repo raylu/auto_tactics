@@ -58,5 +58,20 @@ export const spellIcons = SpriteSheet.fromImageSource({
 	},
 });
 
+const iceBlastProjectileImg = new ImageSource('static/sprites/ice_blast/projectile.png');
+const iceBlastProjectile = SpriteSheet.fromImageSource({
+	image: iceBlastProjectileImg,
+	grid: {
+		rows: 6,
+		columns: 5,
+		spriteHeight: 64,
+		spriteWidth: 64,
+	},
+});
+export const iceBlastAnims = {
+	startup: Animation.fromSpriteSheet(iceBlastProjectile, range(0, 3), 100, AnimationStrategy.Freeze),
+	projectile: Animation.fromSpriteSheet(iceBlastProjectile, range(4, 20), 100),
+} as const;
+
 export const loader = new DefaultLoader();
-loader.addResources([...resources, enemyImg, terrainGrassImg, spellIconsImg]);
+loader.addResources([...resources, enemyImg, terrainGrassImg, spellIconsImg, iceBlastProjectileImg]);
