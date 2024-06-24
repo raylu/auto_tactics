@@ -3,8 +3,9 @@ import {iceSound, sounds} from './sounds';
 import {JsfxrResource} from '@excaliburjs/plugin-jsfxr';
 import {ActionCompleteEvent, ActionContext, ActionSequence, Actor, Color, Engine, Font, Label, MoveTo, Random,
 	ScreenElement, TileMap, vec} from 'excalibur';
-import {enemyAnims, iceBlastAnims, spellIcons, terrainGrass, witchAnims} from './sprites';
+import {enemyAnims, iceBlastAnims, terrainGrass, witchAnims} from './sprites';
 import {loader} from './loader';
+import {spells} from './spells';
 
 const game = new Engine({
 	canvasElement: document.querySelector('canvas#game') as HTMLCanvasElement,
@@ -73,20 +74,10 @@ const scoreDisplay = new Label({
 });
 game.add(scoreDisplay);
 
-const spell1 = new ScreenElement({
-	x: 80,
-	y: game.drawHeight - 120,
-	scale: vec(2, 2),
+spells.forEach((spell, i) => {
+	spell.placeIcon(80 + i * 40, game.drawHeight - 120);
+	game.add(spell.icon);
 });
-spell1.graphics.use(spellIcons.getSprite(3, 2));
-game.add(spell1);
-const spell2 = new ScreenElement({
-	x: 120,
-	y: game.drawHeight - 120,
-	scale: vec(2, 2),
-});
-spell2.graphics.use(spellIcons.getSprite(4, 1));
-game.add(spell2);
 
 const button = new ScreenElement({
 	x: 400,

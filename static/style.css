@@ -20,6 +20,17 @@ canvas#game {
 	display: block;
 	margin: 40px auto;
 }
+tooltip {
+	position: absolute;
+	pointer-events: none;
+	width: 200px;
+	height: 5em;
+	background-color: #111;
+	border: 1px solid #fc0;
+	padding: 4px 8px;
+	opacity: 0;
+	transition: opacity 0.25s;
+}
 
 main, footer {
 	width: 600px;
