@@ -18,6 +18,7 @@ const configs = [
 			'linebreak-style': ['error', 'unix'],
 			'camelcase': ['error'],
 			'comma-dangle': ['error', {'arrays': 'always-multiline', 'objects': 'always-multiline'}],
+			'no-trailing-spaces': ['error'],
 			'object-curly-spacing': ['error', 'never'],
 			'prefer-const': ['error', {'destructuring': 'all'}],
 			'quotes': ['error', 'single'],
