@@ -1,8 +1,7 @@
 import {score} from '../shared/score';
 import {iceSound, sounds} from './sounds';
 import {JsfxrResource} from '@excaliburjs/plugin-jsfxr';
-import {ActionCompleteEvent, ActionContext, ActionSequence, Actor, Color, Engine, Font, Label, MoveTo, Random,
-	ScreenElement, TileMap, vec} from 'excalibur';
+import {ActionContext, ActionSequence, Actor, Color, Engine, Font, Label, Random, ScreenElement, TileMap, vec} from 'excalibur';
 import {enemyAnims, iceBlastAnims, terrainGrass, witchAnims} from './sprites';
 import {loader} from './loader';
 import {spells} from './spells';
@@ -53,18 +52,19 @@ enemy.graphics.use(enemyAnims.idle);
 enemy.graphics.flipHorizontal = true;
 game.add(enemy);
 const enemyAttack = new ActionSequence(enemy, (ctx: ActionContext) => {
-	ctx.moveTo(ENEMY_ATTACK_POS, 1000).delay(700).moveTo(ENEMY_START, 2000);
-});
-enemy.events.on('actioncomplete', (event: ActionCompleteEvent) => {
-	if (event.action instanceof ActionSequence)
-		enemy.graphics.use(enemyAnims.idle);
-	else if (event.action instanceof MoveTo && enemy.pos.equals(ENEMY_ATTACK_POS)) {
-		setTimeout(() => {
+	ctx
+		.moveTo(ENEMY_ATTACK_POS, 1000)
+		.delay(200)
+		.callMethod(() => {
 			sndPlugin.playSound('kinetic');
 			witchAnims.takeDamage.reset();
 			blueWitch.graphics.use(witchAnims.takeDamage);
-		}, 200);
-	}
+		})
+		.delay(500)
+		.moveTo(ENEMY_START, 2000)
+		.callMethod(() => {
+			enemy.graphics.use(enemyAnims.idle);
+		});
 });
 
 const scoreDisplay = new Label({
