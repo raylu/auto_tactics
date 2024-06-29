@@ -98,15 +98,15 @@ button.on('pointerup', () => {
 			iceBlast.graphics.use(iceBlastAnims.startup);
 			iceBlastAnims.startup.events.once('end', () => {
 				iceBlast.graphics.use(iceBlastAnims.projectile);
+				blueWitch.graphics.use(witchAnims.idle);
+				iceBlast.actions.meet(enemy, 800);
 			});
 			game.add(iceBlast);
-			iceBlast.actions.meet(enemy, 600);
 			iceBlast.events.on('actioncomplete', () => {
 				iceBlastAnims.impact.reset();
 				iceBlast.graphics.use(iceBlastAnims.impact);
 				sndPlugin.playSound('spell');
 				iceSound.volume = 0.1;
-				blueWitch.graphics.use(witchAnims.idle);
 			});
 			iceBlastAnims.impact.events.once('end', () => {
 				iceBlast.kill();

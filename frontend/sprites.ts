@@ -80,7 +80,7 @@ const iceBlastImpact = SpriteSheet.fromImageSource({
 	},
 });
 export const iceBlastAnims = {
-	startup: Animation.fromSpriteSheet(iceBlastProjectile, range(0, 3), 100, AnimationStrategy.Freeze),
+	startup: Animation.fromSpriteSheet(iceBlastProjectile, range(0, 3), 200, AnimationStrategy.Freeze),
 	projectile: Animation.fromSpriteSheet(iceBlastProjectile, range(4, 20), 100),
 	impact: Animation.fromSpriteSheet(iceBlastImpact, range(0, 14), 50, AnimationStrategy.Freeze),
 } as const;
