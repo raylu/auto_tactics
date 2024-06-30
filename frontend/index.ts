@@ -40,7 +40,10 @@ const ENEMY_START = vec(500, 150);
 const ENEMY_ATTACK_POS = vec(blueWitch.pos.x + 40, blueWitch.pos.y);
 const enemy = new Actor({
 	pos: ENEMY_START,
+	anchor: vec(2 / 3, 0.5),
 	scale: vec(2, 2),
+	width: 24,
+	height: enemyAnims.idle.height,
 });
 enemy.graphics.use(enemyAnims.idle);
 enemy.graphics.flipHorizontal = true;

@@ -57,13 +57,15 @@ function iceBlast(game: Engine, caster: Actor, target: Actor) {
 	caster.graphics.use(witchAnims.charge);
 	const iceBlastProj = new Actor({
 		pos: caster.pos,
+		width: iceBlastAnims.projectile.width,
+		height: iceBlastAnims.projectile.height,
 	});
 	iceBlastAnims.startup.reset();
 	iceBlastProj.graphics.use(iceBlastAnims.startup);
 	iceBlastAnims.startup.events.once('end', () => {
 		iceBlastProj.graphics.use(iceBlastAnims.projectile);
 		caster.graphics.use(witchAnims.idle);
-		iceBlastProj.actions.meet(target, 800);
+		iceBlastProj.actions.moveTo(target.collider.bounds.center, 800);
 	});
 	game.add(iceBlastProj);
 	iceBlastProj.events.on('actioncomplete', () => {
@@ -81,7 +83,7 @@ function iceBlast(game: Engine, caster: Actor, target: Actor) {
 function iceNova(game: Engine, caster: Actor, target: Actor) {
 	caster.graphics.use(witchAnims.charge);
 	const iceNovaVortex = new Actor({
-		pos: target.pos,
+		pos: target.collider.bounds.center,
 	});
 	iceNovaAnims.startup.reset();
 	iceNovaVortex.graphics.use(iceNovaAnims.startup);

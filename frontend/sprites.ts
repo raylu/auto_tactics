@@ -107,9 +107,9 @@ const iceNovaEnd = SpriteSheet.fromImageSource({
 	},
 });
 export const iceNovaAnims = {
-	startup: Animation.fromSpriteSheet(iceNovaVortex, range(0, 2), 200, AnimationStrategy.Freeze),
+	startup: Animation.fromSpriteSheet(iceNovaVortex, range(0, 2), 250, AnimationStrategy.Freeze),
 	nova: Animation.fromSpriteSheet(iceNovaVortex, range(3, 11), 50, AnimationStrategy.Freeze),
-	end: Animation.fromSpriteSheet(iceNovaEnd, range(0, 7), 100, AnimationStrategy.Freeze),
+	end: Animation.fromSpriteSheet(iceNovaEnd, range(0, 7), 50, AnimationStrategy.Freeze),
 } as const;
 
 loader.addResources([...resources, blueWitchIconImg, enemyImg, terrainGrassImg, spellIconsImg, iceBlastProjectileImg,
