@@ -27,8 +27,8 @@ class Spell {
 			tooltip.style.opacity = '0';
 		});
 		this.icon.on('pointermove', (event: PointerEvent) => {
-			tooltip.style.top = event.pagePos.y - 100 + 'px';
-			tooltip.style.left = event.pagePos.x + 'px';
+			tooltip.style.top = event.screenPos.y - 100 + 'px';
+			tooltip.style.left = event.screenPos.x + 'px';
 		});
 		this.iconPos = vec(0, 0);
 	}

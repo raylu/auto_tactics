@@ -1,7 +1,7 @@
 import {score} from '../shared/score';
 import {iceSound, sounds} from './sounds';
 import {JsfxrResource} from '@excaliburjs/plugin-jsfxr';
-import {ActionContext, ActionSequence, Actor, Color, Engine, Font, Label, Random, ScreenElement, TileMap, vec} from 'excalibur';
+import {ActionContext, ActionSequence, Actor, Color, Engine, Font, Label, Random, TileMap, vec} from 'excalibur';
 import {enemyAnims, iceBlastAnims, terrainGrass, witchAnims} from './sprites';
 import {loader} from './loader';
 import {initSpells} from './spells';
@@ -76,14 +76,11 @@ game.add(scoreDisplay);
 
 initSpells(game);
 
-const button = new ScreenElement({
-	x: 400,
-	y: game.drawHeight - 80,
-	width: 100,
-	height: 40,
-	color: Color.Vermilion,
+const start = document.querySelector('button#start') as HTMLButtonElement;
+game.on('initialize', () => {
+	start.style.display = 'block';
 });
-button.on('pointerup', () => {
+start.addEventListener('click', () => {
 	let playerTurn = true;
 	const interval = setInterval(() => {
 		if (playerTurn) {
@@ -125,6 +122,5 @@ button.on('pointerup', () => {
 		scoreDisplay.graphics.visible = true;
 	}, 6000);
 });
-game.add(button);
 
 void game.start(loader);
