@@ -1,5 +1,5 @@
 import {Actor, Color, type Engine, type PointerEvent, range, ScreenElement, type Vector, vec} from 'excalibur';
-import {blueWitchIconImg, iceBlastAnims, spellIcons, witchAnims} from './sprites';
+import {blueWitchIconImg, iceBlastAnims, iceNovaAnims, spellIcons, witchAnims} from './sprites';
 import {iceSound, sndPlugin} from './sounds';
 
 const tooltip = document.querySelector<HTMLElement>('tooltip')!;
@@ -78,9 +78,34 @@ function iceBlast(game: Engine, caster: Actor, target: Actor) {
 	void iceSound.play(0.5);
 }
 
+function iceNova(game: Engine, caster: Actor, target: Actor) {
+	caster.graphics.use(witchAnims.charge);
+	const iceNovaVortex = new Actor({
+		pos: target.pos,
+	});
+	iceNovaAnims.startup.reset();
+	iceNovaVortex.graphics.use(iceNovaAnims.startup);
+	iceNovaAnims.startup.events.once('end', () => {
+		iceNovaAnims.nova.reset();
+		iceNovaVortex.graphics.use(iceNovaAnims.nova);
+		caster.graphics.use(witchAnims.idle);
+	});
+	iceNovaAnims.nova.events.once('end', () => {
+		iceNovaAnims.end.reset();
+		iceNovaVortex.graphics.use(iceNovaAnims.end);
+		sndPlugin.playSound('spellBig');
+		iceSound.volume = 0.1;
+	});
+	iceNovaAnims.end.events.once('end', () => {
+		iceNovaVortex.kill();
+	});
+	game.add(iceNovaVortex);
+	void iceSound.play(0.5);
+}
+
 const spells = [
 	new Spell('ice blast', 3, 2, iceBlast),
-	new Spell('ice nova', 4, 1, () => {}),
+	new Spell('ice nova', 4, 1, iceNova),
 ];
 
 export const spellSlots = {

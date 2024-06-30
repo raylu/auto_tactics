@@ -86,5 +86,31 @@ export const iceBlastAnims = {
 	impact: Animation.fromSpriteSheet(iceBlastImpact, range(0, 14), 50, AnimationStrategy.Freeze),
 } as const;
 
+const iceNovaVortexImg = new ImageSource('static/sprites/ice_nova/vortex.png');
+const iceNovaVortex = SpriteSheet.fromImageSource({
+	image: iceNovaVortexImg,
+	grid: {
+		rows: 3,
+		columns: 4,
+		spriteHeight: 128,
+		spriteWidth: 128,
+	},
+});
+const iceNovaEndImg = new ImageSource('static/sprites/ice_nova/end.png');
+const iceNovaEnd = SpriteSheet.fromImageSource({
+	image: iceNovaEndImg,
+	grid: {
+		rows: 3,
+		columns: 3,
+		spriteHeight: 128,
+		spriteWidth: 128,
+	},
+});
+export const iceNovaAnims = {
+	startup: Animation.fromSpriteSheet(iceNovaVortex, range(0, 2), 200, AnimationStrategy.Freeze),
+	nova: Animation.fromSpriteSheet(iceNovaVortex, range(3, 11), 50, AnimationStrategy.Freeze),
+	end: Animation.fromSpriteSheet(iceNovaEnd, range(0, 7), 100, AnimationStrategy.Freeze),
+} as const;
+
 loader.addResources([...resources, blueWitchIconImg, enemyImg, terrainGrassImg, spellIconsImg, iceBlastProjectileImg,
-	iceBlastImpactImg]);
+	iceBlastImpactImg, iceNovaVortexImg, iceNovaEndImg]);
