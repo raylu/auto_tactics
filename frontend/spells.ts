@@ -1,4 +1,4 @@
-import {type Engine, type PointerEvent, ScreenElement, vec, type Vector} from 'excalibur';
+import {Color, type Engine, type PointerEvent, range, ScreenElement, type Vector, vec} from 'excalibur';
 import {spellIcons} from './sprites';
 
 const tooltip = document.querySelector<HTMLElement>('tooltip')!;
@@ -16,6 +16,7 @@ class Spell {
 			height: iconSprite.height / 2,
 			scale: vec(2, 2),
 			anchor: vec(0.5, 0.5),
+			z: 1,
 		});
 		this.icon.graphics.use(iconSprite);
 		this.icon.on('pointerenter', () => {
@@ -31,9 +32,9 @@ class Spell {
 		});
 		this.iconPos = vec(0, 0);
 	}
-	placeIcon(x: number, y: number) {
-		this.iconPos = vec(x, y);
-		this.icon.pos = this.iconPos.clone();
+	placeIcon(pos: Vector) {
+		this.iconPos = pos;
+		this.icon.pos = pos.clone();
 	}
 }
 
@@ -41,11 +42,29 @@ const spells = [
 	new Spell('ice blast', 3, 2),
 	new Spell('ice nova', 4, 1),
 ];
-
 export function initSpells(game: Engine) {
 	spells.forEach((spell, i) => {
-		spell.placeIcon(80 + i * 40, game.drawHeight - 120);
+		spell.placeIcon(vec(80 + i * 40, game.drawHeight - 150));
 		game.add(spell.icon);
+	});
+
+	game.add(new ScreenElement({ // spell slots background
+		color: Color.fromRGB(0, 10, 20),
+		height: 60,
+		width: 160,
+		pos: vec(50, game.drawHeight - 70),
+		anchor: vec(0, 0.5),
+	}));
+	const spellSlots = range(0, 2).map((i) => {
+		const spellSlot = new ScreenElement({
+			color: Color.fromRGB(10, 20, 30),
+			height: 40,
+			width: 40,
+			pos: vec(80 + i * 50, game.drawHeight - 70),
+			anchor: vec(0.5, 0.5),
+		});
+		game.add(spellSlot);
+		return spellSlot;
 	});
 
 	let draggedSpell: Spell | null = null;
@@ -66,6 +85,11 @@ export function initSpells(game: Engine) {
 	game.input.pointers.primary.on('up', (event: PointerEvent) => {
 		if (draggedSpell === null)
 			return;
+		for (const spellSlot of spellSlots)
+			if (spellSlot.contains(event.screenPos.x, event.screenPos.y)) {
+				draggedSpell.placeIcon(spellSlot.pos.clone());
+				break;
+			}
 		draggedSpell.icon.actions.moveTo(draggedSpell.iconPos, 1000);
 		draggedSpell = null;
 	});
