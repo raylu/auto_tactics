@@ -1,5 +1,6 @@
-import {Color, type Engine, type PointerEvent, range, ScreenElement, type Vector, vec} from 'excalibur';
-import {blueWitchIconImg, spellIcons} from './sprites';
+import {Actor, Color, type Engine, type PointerEvent, range, ScreenElement, type Vector, vec} from 'excalibur';
+import {blueWitchIconImg, iceBlastAnims, spellIcons, witchAnims} from './sprites';
+import {iceSound, sndPlugin} from './sounds';
 
 const tooltip = document.querySelector<HTMLElement>('tooltip')!;
 
@@ -7,13 +8,15 @@ interface SpellSlot {
 	readonly slot: ScreenElement;
 	spell: Spell | null;
 }
+type CastFn = (game: Engine, caster: Actor, target: Actor) => void;
 
 class Spell {
 	name: string;
 	icon: ScreenElement;
 	iconPos: Vector;
 	spellSlot: SpellSlot | null = null;
-	constructor(name: string, iconX: number, iconY: number) {
+	castFn: CastFn;
+	constructor(name: string, iconX: number, iconY: number, castFn: CastFn) {
 		this.name = name;
 
 		const iconSprite = spellIcons.getSprite(iconX, iconY);
@@ -37,6 +40,8 @@ class Spell {
 			tooltip.style.left = event.screenPos.x + 'px';
 		});
 		this.iconPos = vec(0, 0);
+
+		this.castFn = castFn;
 	}
 	placeIcon(spellSlot: SpellSlot) {
 		spellSlot.spell = this;
@@ -48,12 +53,37 @@ class Spell {
 	}
 }
 
+function iceBlast(game: Engine, caster: Actor, target: Actor) {
+	caster.graphics.use(witchAnims.charge);
+	const iceBlastProj = new Actor({
+		pos: caster.pos,
+	});
+	iceBlastAnims.startup.reset();
+	iceBlastProj.graphics.use(iceBlastAnims.startup);
+	iceBlastAnims.startup.events.once('end', () => {
+		iceBlastProj.graphics.use(iceBlastAnims.projectile);
+		caster.graphics.use(witchAnims.idle);
+		iceBlastProj.actions.meet(target, 800);
+	});
+	game.add(iceBlastProj);
+	iceBlastProj.events.on('actioncomplete', () => {
+		iceBlastAnims.impact.reset();
+		iceBlastProj.graphics.use(iceBlastAnims.impact);
+		sndPlugin.playSound('spell');
+		iceSound.volume = 0.1;
+	});
+	iceBlastAnims.impact.events.once('end', () => {
+		iceBlastProj.kill();
+	});
+	void iceSound.play(0.5);
+}
+
 const spells = [
-	new Spell('ice blast', 3, 2),
-	new Spell('ice nova', 4, 1),
+	new Spell('ice blast', 3, 2, iceBlast),
+	new Spell('ice nova', 4, 1, () => {}),
 ];
 
-const spellSlots = {
+export const spellSlots = {
 	bar: [] as SpellSlot[],
 	blueWitch: [] as SpellSlot[],
 };
@@ -98,7 +128,7 @@ export function initSpells(game: Engine) {
 	}));
 	spellSlots.blueWitch = range(0, 2).map((i) => {
 		const slot = new ScreenElement({
-			color: Color.fromRGB(10, 20, 30),
+			color: Color.fromRGB(92, 97, 128),
 			height: 40,
 			width: 40,
 			pos: vec(105 + i * 50, game.drawHeight - 70),

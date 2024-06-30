@@ -1,10 +1,9 @@
 import {score} from '../shared/score';
-import {iceSound, sounds} from './sounds';
-import {JsfxrResource} from '@excaliburjs/plugin-jsfxr';
+import {sndPlugin} from './sounds';
 import {ActionContext, ActionSequence, Actor, Color, Engine, Font, Label, Random, TileMap, vec} from 'excalibur';
-import {enemyAnims, iceBlastAnims, terrainGrass, witchAnims} from './sprites';
+import {enemyAnims, terrainGrass, witchAnims} from './sprites';
 import {loader} from './loader';
-import {initSpells} from './spells';
+import {initSpells, spellSlots} from './spells';
 
 const game = new Engine({
 	canvasElement: document.querySelector('canvas#game') as HTMLCanvasElement,
@@ -14,11 +13,6 @@ const game = new Engine({
 	pixelArt: true,
 	suppressConsoleBootMessage: true,
 });
-
-const sndPlugin = new JsfxrResource();
-void sndPlugin.init();
-for (const sound in sounds)
-	sndPlugin.loadSoundConfig(sound, sounds[sound]);
 
 const referenceGrassSprite = terrainGrass.getSprite(0, 0);
 const background = new TileMap({
@@ -84,28 +78,7 @@ start.addEventListener('click', () => {
 	let playerTurn = true;
 	const interval = setInterval(() => {
 		if (playerTurn) {
-			blueWitch.graphics.use(witchAnims.charge);
-			const iceBlast = new Actor({
-				pos: blueWitch.pos,
-			});
-			iceBlastAnims.startup.reset();
-			iceBlast.graphics.use(iceBlastAnims.startup);
-			iceBlastAnims.startup.events.once('end', () => {
-				iceBlast.graphics.use(iceBlastAnims.projectile);
-				blueWitch.graphics.use(witchAnims.idle);
-				iceBlast.actions.meet(enemy, 800);
-			});
-			game.add(iceBlast);
-			iceBlast.events.on('actioncomplete', () => {
-				iceBlastAnims.impact.reset();
-				iceBlast.graphics.use(iceBlastAnims.impact);
-				sndPlugin.playSound('spell');
-				iceSound.volume = 0.1;
-			});
-			iceBlastAnims.impact.events.once('end', () => {
-				iceBlast.kill();
-			});
-			void iceSound.play(0.5);
+			spellSlots.blueWitch[0].spell?.castFn(game, blueWitch, enemy);
 		} else {
 			blueWitch.graphics.use(witchAnims.idle);
 			enemyAnims.attack.reset();

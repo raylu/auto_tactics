@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 
-import type {SoundConfig} from '@excaliburjs/plugin-jsfxr';
+import {JsfxrResource, type SoundConfig} from '@excaliburjs/plugin-jsfxr';
 import {Sound} from 'excalibur';
 import {loader} from './loader';
 
@@ -64,6 +64,11 @@ export const sounds: {[key: string]: SoundConfig} = {
 		sample_size: 8,
 	},
 } as const;
+
+export const sndPlugin = new JsfxrResource();
+void sndPlugin.init();
+for (const sound in sounds)
+	sndPlugin.loadSoundConfig(sound, sounds[sound]);
 
 export const iceSound = new Sound('static/audio/ice.m4a');
 
