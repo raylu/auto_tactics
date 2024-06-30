@@ -12,13 +12,12 @@ class Spell {
 
 		const iconSprite = spellIcons.getSprite(iconX, iconY);
 		this.icon = new ScreenElement({
-			width: iconSprite.width,
-			height: iconSprite.height,
+			width: iconSprite.width / 2,
+			height: iconSprite.height / 2,
 			scale: vec(2, 2),
 			anchor: vec(0.5, 0.5),
 		});
 		this.icon.graphics.use(iconSprite);
-		this.icon.pointer.useGraphicsBounds = true;
 		this.icon.on('pointerenter', () => {
 			tooltip.innerText = name;
 			tooltip.style.opacity = '0.9';
