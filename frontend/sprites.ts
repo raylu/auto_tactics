@@ -21,6 +21,7 @@ export const witchAnims = {
 	charge: witchAnimation('charge', 5, 48),
 	takeDamage: witchAnimation('take_damage', 3, 32, AnimationStrategy.Freeze),
 } as const;
+export const blueWitchIconImg = new ImageSource('static/sprites/blue_witch/icon.gif');
 
 const enemyImg = new ImageSource('static/sprites/enemy.png');
 const enemySprites = SpriteSheet.fromImageSource({
@@ -85,4 +86,5 @@ export const iceBlastAnims = {
 	impact: Animation.fromSpriteSheet(iceBlastImpact, range(0, 14), 50, AnimationStrategy.Freeze),
 } as const;
 
-loader.addResources([...resources, enemyImg, terrainGrassImg, spellIconsImg, iceBlastProjectileImg, iceBlastImpactImg]);
+loader.addResources([...resources, blueWitchIconImg, enemyImg, terrainGrassImg, spellIconsImg, iceBlastProjectileImg,
+	iceBlastImpactImg]);

@@ -1,5 +1,5 @@
 import {Color, type Engine, type PointerEvent, range, ScreenElement, type Vector, vec} from 'excalibur';
-import {spellIcons} from './sprites';
+import {blueWitchIconImg, spellIcons} from './sprites';
 
 const tooltip = document.querySelector<HTMLElement>('tooltip')!;
 
@@ -43,16 +43,29 @@ const spells = [
 	new Spell('ice nova', 4, 1),
 ];
 export function initSpells(game: Engine) {
+	game.add(new ScreenElement({ // spell bar background
+		color: Color.fromRGB(0, 0, 0),
+		height: 40,
+		width: 150,
+		pos: vec(50, game.drawHeight - 150),
+		anchor: vec(0, 0.5),
+	}));
 	spells.forEach((spell, i) => {
-		spell.placeIcon(vec(80 + i * 40, game.drawHeight - 150));
+		spell.placeIcon(vec(70 + i * 40, game.drawHeight - 150));
 		game.add(spell.icon);
 	});
 
+	const blueWitchIcon = new ScreenElement({
+		pos: vec(40, game.drawHeight - 70),
+		anchor: vec(0.5, 0.5),
+	});
+	blueWitchIcon.graphics.use(blueWitchIconImg.toSprite());
+	game.add(blueWitchIcon);
 	game.add(new ScreenElement({ // spell slots background
 		color: Color.fromRGB(0, 10, 20),
 		height: 60,
 		width: 160,
-		pos: vec(50, game.drawHeight - 70),
+		pos: vec(75, game.drawHeight - 70),
 		anchor: vec(0, 0.5),
 	}));
 	const spellSlots = range(0, 2).map((i) => {
@@ -60,7 +73,7 @@ export function initSpells(game: Engine) {
 			color: Color.fromRGB(10, 20, 30),
 			height: 40,
 			width: 40,
-			pos: vec(80 + i * 50, game.drawHeight - 70),
+			pos: vec(105 + i * 50, game.drawHeight - 70),
 			anchor: vec(0.5, 0.5),
 		});
 		game.add(spellSlot);
