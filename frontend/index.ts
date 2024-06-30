@@ -4,7 +4,7 @@ import {JsfxrResource} from '@excaliburjs/plugin-jsfxr';
 import {ActionContext, ActionSequence, Actor, Color, Engine, Font, Label, Random, ScreenElement, TileMap, vec} from 'excalibur';
 import {enemyAnims, iceBlastAnims, terrainGrass, witchAnims} from './sprites';
 import {loader} from './loader';
-import {spells} from './spells';
+import {initSpells} from './spells';
 
 const game = new Engine({
 	canvasElement: document.querySelector('canvas#game') as HTMLCanvasElement,
@@ -74,10 +74,7 @@ const scoreDisplay = new Label({
 });
 game.add(scoreDisplay);
 
-spells.forEach((spell, i) => {
-	spell.placeIcon(80 + i * 40, game.drawHeight - 120);
-	game.add(spell.icon);
-});
+initSpells(game);
 
 const button = new ScreenElement({
 	x: 400,
