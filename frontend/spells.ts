@@ -3,10 +3,16 @@ import {blueWitchIconImg, spellIcons} from './sprites';
 
 const tooltip = document.querySelector<HTMLElement>('tooltip')!;
 
+interface SpellSlot {
+	readonly slot: ScreenElement;
+	spell: Spell | null;
+}
+
 class Spell {
 	name: string;
 	icon: ScreenElement;
 	iconPos: Vector;
+	spellSlot: SpellSlot | null = null;
 	constructor(name: string, iconX: number, iconY: number) {
 		this.name = name;
 
@@ -32,9 +38,13 @@ class Spell {
 		});
 		this.iconPos = vec(0, 0);
 	}
-	placeIcon(pos: Vector) {
-		this.iconPos = pos;
-		this.icon.pos = pos.clone();
+	placeIcon(spellSlot: SpellSlot) {
+		spellSlot.spell = this;
+		if (this.spellSlot !== null)
+			this.spellSlot.spell = null;
+		this.spellSlot = spellSlot;
+		this.iconPos = spellSlot.slot.pos.clone();
+		this.icon.pos = spellSlot.slot.pos.clone();
 	}
 }
 
@@ -42,16 +52,34 @@ const spells = [
 	new Spell('ice blast', 3, 2),
 	new Spell('ice nova', 4, 1),
 ];
+
+const spellSlots = {
+	bar: [] as SpellSlot[],
+	blueWitch: [] as SpellSlot[],
+};
+
 export function initSpells(game: Engine) {
 	game.add(new ScreenElement({ // spell bar background
 		color: Color.fromRGB(0, 0, 0),
 		height: 40,
-		width: 150,
+		width: 162,
 		pos: vec(50, game.drawHeight - 150),
 		anchor: vec(0, 0.5),
 	}));
+	spellSlots.bar = range(0, 3).map((i) => {
+		const slot = new ScreenElement({
+			color: Color.fromRGB(100, 100, 100),
+			height: 34,
+			width: 34,
+			pos: vec(70 + i * 40, game.drawHeight - 150),
+			anchor: vec(0.5, 0.5),
+		});
+		game.add(slot);
+		return {slot, spell: null};
+	});
 	spells.forEach((spell, i) => {
-		spell.placeIcon(vec(70 + i * 40, game.drawHeight - 150));
+		spellSlots.bar[i].spell = spell;
+		spell.placeIcon(spellSlots.bar[i]);
 		game.add(spell.icon);
 	});
 
@@ -68,16 +96,16 @@ export function initSpells(game: Engine) {
 		pos: vec(75, game.drawHeight - 70),
 		anchor: vec(0, 0.5),
 	}));
-	const spellSlots = range(0, 2).map((i) => {
-		const spellSlot = new ScreenElement({
+	spellSlots.blueWitch = range(0, 2).map((i) => {
+		const slot = new ScreenElement({
 			color: Color.fromRGB(10, 20, 30),
 			height: 40,
 			width: 40,
 			pos: vec(105 + i * 50, game.drawHeight - 70),
 			anchor: vec(0.5, 0.5),
 		});
-		game.add(spellSlot);
-		return spellSlot;
+		game.add(slot);
+		return {slot, spell: null};
 	});
 
 	let draggedSpell: Spell | null = null;
@@ -98,11 +126,13 @@ export function initSpells(game: Engine) {
 	game.input.pointers.primary.on('up', (event: PointerEvent) => {
 		if (draggedSpell === null)
 			return;
-		for (const spellSlot of spellSlots)
-			if (spellSlot.contains(event.screenPos.x, event.screenPos.y)) {
-				draggedSpell.placeIcon(spellSlot.pos.clone());
-				break;
-			}
+		for (const slotGroup of Object.values(spellSlots)) {
+			for (const spellSlot of slotGroup)
+				if (spellSlot.spell === null && spellSlot.slot.contains(event.screenPos.x, event.screenPos.y)) {
+					draggedSpell.placeIcon(spellSlot);
+					break;
+				}
+		}
 		draggedSpell.icon.actions.moveTo(draggedSpell.iconPos, 1000);
 		draggedSpell = null;
 	});
