@@ -85,7 +85,14 @@ start.addEventListener('click', () => {
 	let playerTurn = true;
 	const interval = setInterval(() => {
 		if (playerTurn) {
-			spellSlots.blueWitch[0].spell?.castFn(game, blueWitch, enemy);
+			for (const {spell} of spellSlots.blueWitch) {
+				if (spell === null || (spell.cooldown?.remaining ?? 0) > 0)
+					continue;
+				spell.castFn(game, blueWitch, enemy);
+				if (spell.cooldown !== null)
+					spell.cooldown.remaining = spell.cooldown.base;
+				break;
+			}
 		} else {
 			blueWitch.graphics.use(witchAnims.idle);
 			enemyAnims.attack.reset();

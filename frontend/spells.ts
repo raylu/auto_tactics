@@ -31,7 +31,7 @@ class Spell {
 	constructor(opts: SpellOpts) {
 		this.name = opts.name;
 		if (opts.baseCooldown !== null)
-			this.cooldown = {base: opts.baseCooldown, remaining: opts.baseCooldown};
+			this.cooldown = {base: opts.baseCooldown, remaining: 0};
 
 		const iconSprite = spellIcons.getSprite(opts.icon.x, opts.icon.y);
 		this.icon = new ScreenElement({
