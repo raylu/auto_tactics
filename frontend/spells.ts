@@ -3,24 +3,37 @@ import {blueWitchIconImg, iceBlastAnims, iceNovaAnims, spellIcons, witchAnims} f
 import {iceSound, sndPlugin} from './sounds';
 import {gameState} from './state';
 
-const tooltip = document.querySelector<HTMLElement>('tooltip')!;
+interface SpellOpts {
+	name: string;
+	baseCooldown: number | null;
+	icon: {x: number; y: number};
+	castFn: CastFn;
+}
+type CastFn = (game: Engine, caster: Actor, target: Actor) => void;
 
 interface SpellSlot {
 	readonly slot: ScreenElement;
 	spell: Spell | null;
 }
-type CastFn = (game: Engine, caster: Actor, target: Actor) => void;
+
+const tooltip = document.querySelector<HTMLElement>('tooltip')!;
 
 class Spell {
 	name: string;
 	icon: ScreenElement;
 	iconPos: Vector;
 	spellSlot: SpellSlot | null = null;
+	cooldown: null | {
+		base: number;
+		remaining: number;
+	} = null;
 	castFn: CastFn;
-	constructor(name: string, iconX: number, iconY: number, castFn: CastFn) {
-		this.name = name;
+	constructor(opts: SpellOpts) {
+		this.name = opts.name;
+		if (opts.baseCooldown !== null)
+			this.cooldown = {base: opts.baseCooldown, remaining: opts.baseCooldown};
 
-		const iconSprite = spellIcons.getSprite(iconX, iconY);
+		const iconSprite = spellIcons.getSprite(opts.icon.x, opts.icon.y);
 		this.icon = new ScreenElement({
 			width: iconSprite.width / 2,
 			height: iconSprite.height / 2,
@@ -30,7 +43,7 @@ class Spell {
 		});
 		this.icon.graphics.use(iconSprite);
 		this.icon.on('pointerenter', () => {
-			tooltip.innerText = name;
+			tooltip.innerText = opts.name;
 			tooltip.style.opacity = '0.9';
 		});
 		this.icon.on('pointerleave', () => {
@@ -42,7 +55,7 @@ class Spell {
 		});
 		this.iconPos = vec(0, 0);
 
-		this.castFn = castFn;
+		this.castFn = opts.castFn;
 	}
 	placeIcon(spellSlot: SpellSlot) {
 		spellSlot.spell = this;
@@ -107,8 +120,8 @@ function iceNova(game: Engine, caster: Actor, target: Actor) {
 }
 
 const spells = [
-	new Spell('ice blast', 3, 2, iceBlast),
-	new Spell('ice nova', 4, 1, iceNova),
+	new Spell({name: 'ice blast', baseCooldown: null, icon: {x: 3, y: 2}, castFn: iceBlast}),
+	new Spell({name: 'ice nova', baseCooldown: 4, icon: {x: 4, y: 1}, castFn: iceNova}),
 ];
 
 export const spellSlots = {
