@@ -41,6 +41,11 @@ button#start {
 	background-color: #c68;
 	color: #111;
 }
+button#start:disabled {
+	background-color: #a79;
+	border-color: #aaa;
+	color: #444;
+}
 
 main, footer {
 	position: relative;

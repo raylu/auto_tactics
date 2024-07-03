@@ -4,6 +4,7 @@ import {ActionContext, ActionSequence, Actor, Color, Engine, Font, Label, Random
 import {enemyAnims, terrainGrass, witchAnims} from './sprites';
 import {loader} from './loader';
 import {initSpells, spellSlots} from './spells';
+import {gameState} from './state';
 
 const game = new Engine({
 	canvasElement: document.querySelector('canvas#game') as HTMLCanvasElement,
@@ -78,6 +79,10 @@ game.on('initialize', () => {
 	start.style.display = 'block';
 });
 start.addEventListener('click', () => {
+	if (gameState.simulating)
+		return;
+	start.disabled = gameState.simulating = true;
+
 	let playerTurn = true;
 	const interval = setInterval(() => {
 		if (playerTurn) {
@@ -96,6 +101,7 @@ start.addEventListener('click', () => {
 		scoreDisplay.text = String(score());
 		scoreDisplay.pos.x = game.drawWidth - 10 - scoreDisplay.text.length * 15;
 		scoreDisplay.graphics.visible = true;
+		start.disabled = gameState.simulating = false;
 	}, 6000);
 });
 

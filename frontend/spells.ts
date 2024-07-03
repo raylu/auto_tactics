@@ -1,6 +1,7 @@
 import {Actor, Color, type Engine, type PointerEvent, range, ScreenElement, type Vector, vec} from 'excalibur';
 import {blueWitchIconImg, iceBlastAnims, iceNovaAnims, spellIcons, witchAnims} from './sprites';
 import {iceSound, sndPlugin} from './sounds';
+import {gameState} from './state';
 
 const tooltip = document.querySelector<HTMLElement>('tooltip')!;
 
@@ -167,7 +168,7 @@ export function initSpells(game: Engine) {
 
 	let draggedSpell: Spell | null = null;
 	game.input.pointers.primary.on('down', (event: PointerEvent) => {
-		if (draggedSpell !== null)
+		if (draggedSpell !== null || gameState.simulating)
 			return;
 		for (const spell of spells)
 			if (spell.icon.contains(event.screenPos.x, event.screenPos.y)) {
@@ -176,12 +177,12 @@ export function initSpells(game: Engine) {
 			}
 	});
 	game.input.pointers.primary.on('move', (event: PointerEvent) => {
-		if (draggedSpell === null)
+		if (draggedSpell === null || gameState.simulating)
 			return;
 		draggedSpell.icon.pos = event.screenPos;
 	});
 	game.input.pointers.primary.on('up', (event: PointerEvent) => {
-		if (draggedSpell === null)
+		if (draggedSpell === null || gameState.simulating)
 			return;
 		for (const slotGroup of Object.values(spellSlots)) {
 			for (const spellSlot of slotGroup)
