@@ -38,7 +38,6 @@ witchAnims.takeDamage.events.on('end', () => {
 });
 
 const ENEMY_START = vec(500, 150);
-const ENEMY_ATTACK_POS = vec(blueWitch.pos.x + 40, blueWitch.pos.y);
 const enemy = new Actor({
 	pos: ENEMY_START,
 	anchor: vec(2 / 3, 0.5),
@@ -51,7 +50,7 @@ enemy.graphics.flipHorizontal = true;
 game.add(enemy);
 const enemyAttack = new ActionSequence(enemy, (ctx: ActionContext) => {
 	ctx
-		.moveTo(ENEMY_ATTACK_POS, 1000)
+		.moveTo(vec(blueWitch.pos.x + 60, blueWitch.pos.y), 1000)
 		.delay(200)
 		.callMethod(() => {
 			sndPlugin.playSound('kinetic');
