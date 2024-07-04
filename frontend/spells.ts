@@ -43,7 +43,9 @@ class Spell {
 		});
 		this.icon.graphics.use(iconSprite);
 		this.icon.on('pointerenter', () => {
-			tooltip.innerText = opts.name;
+			tooltip.innerHTML = `<b>${opts.name}</b>`;
+			if (this.cooldown !== null)
+				tooltip.innerHTML += `<br>cooldown: ${this.cooldown.base}`;
 			tooltip.style.opacity = '0.9';
 		});
 		this.icon.on('pointerleave', () => {
