@@ -1,4 +1,5 @@
-import {Actor, Color, type Engine, Label, type PointerEvent, range, ScreenElement, type Vector, vec, Font} from 'excalibur';
+import {Actor, BaseAlign, Color, type Engine, Font, Label, type PointerEvent, range, ScreenElement, TextAlign,
+	type Vector, vec} from 'excalibur';
 import {blueWitchIconImg, iceBlastAnims, iceNovaAnims, spellIcons, witchAnims} from './sprites';
 import {iceSound, sndPlugin} from './sounds';
 import {gameState} from './state';
@@ -17,6 +18,16 @@ interface SpellSlot {
 }
 
 const tooltip = document.querySelector<HTMLElement>('tooltip')!;
+const cooldownFont = new Font({
+	size: 16,
+	color: Color.White,
+	shadow: {
+		offset: vec(1, 1),
+		color: Color.Black,
+	},
+	textAlign: TextAlign.Center,
+	baseAlign: BaseAlign.Middle,
+});
 
 class Spell {
 	name: string;
@@ -75,7 +86,8 @@ class Spell {
 			this.cooldown.remaining = this.cooldown.base;
 			const cdLabel = new Label({
 				text: String(this.cooldown.base),
-				font: new Font({size: 16, color: Color.White}),
+				font: cooldownFont,
+				pos: vec(-1, 0),
 				z: 1,
 			});
 			this.icon.addChild(cdLabel);
