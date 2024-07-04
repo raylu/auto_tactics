@@ -3,7 +3,7 @@ import {sndPlugin} from './sounds';
 import {ActionContext, ActionSequence, Actor, Color, Engine, Font, Label, Random, TileMap, vec} from 'excalibur';
 import {enemyAnims, terrainGrass, witchAnims} from './sprites';
 import {loader} from './loader';
-import {initSpells, spellSlots} from './spells';
+import {initSpells, spellSlots, spells} from './spells';
 import {gameState} from './state';
 
 const game = new Engine({
@@ -85,13 +85,30 @@ start.addEventListener('click', () => {
 	let playerTurn = true;
 	const interval = setInterval(() => {
 		if (playerTurn) {
+			let casted = false;
 			for (const {spell} of spellSlots.blueWitch) {
-				if (spell === null || (spell.cooldown?.remaining ?? 0) > 0)
+				if (spell === null)
 					continue;
-				spell.castFn(game, blueWitch, enemy);
-				if (spell.cooldown !== null)
-					spell.cooldown.remaining = spell.cooldown.base;
-				break;
+				if (!casted && (spell.cooldown?.remaining ?? 0) == 0) {
+					spell.castFn(game, blueWitch, enemy);
+					if (spell.cooldown !== null) {
+						spell.cooldown.remaining = spell.cooldown.base;
+						const cdLabel = new Label({
+							text: String(spell.cooldown.base),
+							font: new Font({size: 16, color: Color.White}),
+							z: 1,
+						});
+						spell.icon.addChild(cdLabel);
+					}
+					casted = true;
+				} else if (spell.cooldown !== null && spell.cooldown.remaining > 0) {
+					spell.cooldown.remaining--;
+					const cdLabel = spell.icon.children[0] as Label;
+					if (spell.cooldown.remaining === 0)
+						spell.icon.removeChild(cdLabel);
+					else
+						cdLabel.text = String(spell.cooldown.remaining);
+				}
 			}
 		} else {
 			blueWitch.graphics.use(witchAnims.idle);
@@ -107,8 +124,14 @@ start.addEventListener('click', () => {
 		scoreDisplay.text = String(score());
 		scoreDisplay.pos.x = game.drawWidth - 10 - scoreDisplay.text.length * 15;
 		scoreDisplay.graphics.visible = true;
+
+		for (const spell of spells)
+			if (spell.cooldown !== null) {
+				spell.cooldown.remaining = 0;
+				spell.icon.removeAllChildren();
+			}
 		start.disabled = gameState.simulating = false;
-	}, 6000);
+	}, 12000);
 });
 
 void game.start(loader);

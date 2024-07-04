@@ -119,7 +119,7 @@ function iceNova(game: Engine, caster: Actor, target: Actor) {
 	void iceSound.play(0.5);
 }
 
-const spells = [
+export const spells = [
 	new Spell({name: 'ice blast', baseCooldown: null, icon: {x: 3, y: 2}, castFn: iceBlast}),
 	new Spell({name: 'ice nova', baseCooldown: 4, icon: {x: 4, y: 1}, castFn: iceNova}),
 ];
