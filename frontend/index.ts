@@ -91,24 +91,10 @@ start.addEventListener('click', () => {
 					continue;
 				if (!casted && (spell.cooldown?.remaining ?? 0) == 0) {
 					spell.castFn(game, blueWitch, enemy);
-					if (spell.cooldown !== null) {
-						spell.cooldown.remaining = spell.cooldown.base;
-						const cdLabel = new Label({
-							text: String(spell.cooldown.base),
-							font: new Font({size: 16, color: Color.White}),
-							z: 1,
-						});
-						spell.icon.addChild(cdLabel);
-					}
+					spell.startCooldown();
 					casted = true;
-				} else if (spell.cooldown !== null && spell.cooldown.remaining > 0) {
-					spell.cooldown.remaining--;
-					const cdLabel = spell.icon.children[0] as Label;
-					if (spell.cooldown.remaining === 0)
-						spell.icon.removeChild(cdLabel);
-					else
-						cdLabel.text = String(spell.cooldown.remaining);
-				}
+				} else
+					spell.decrementCooldown();
 			}
 		} else {
 			blueWitch.graphics.use(witchAnims.idle);
@@ -126,10 +112,7 @@ start.addEventListener('click', () => {
 		scoreDisplay.graphics.visible = true;
 
 		for (const spell of spells)
-			if (spell.cooldown !== null) {
-				spell.cooldown.remaining = 0;
-				spell.icon.removeAllChildren();
-			}
+			spell.resetCooldown();
 		start.disabled = gameState.simulating = false;
 	}, 12000);
 });

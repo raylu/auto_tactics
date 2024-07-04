@@ -1,4 +1,4 @@
-import {Actor, Color, type Engine, type PointerEvent, range, ScreenElement, type Vector, vec} from 'excalibur';
+import {Actor, Color, type Engine, Label, type PointerEvent, range, ScreenElement, type Vector, vec, Font} from 'excalibur';
 import {blueWitchIconImg, iceBlastAnims, iceNovaAnims, spellIcons, witchAnims} from './sprites';
 import {iceSound, sndPlugin} from './sounds';
 import {gameState} from './state';
@@ -28,6 +28,7 @@ class Spell {
 		remaining: number;
 	} = null;
 	castFn: CastFn;
+
 	constructor(opts: SpellOpts) {
 		this.name = opts.name;
 		if (opts.baseCooldown !== null)
@@ -59,6 +60,7 @@ class Spell {
 
 		this.castFn = opts.castFn;
 	}
+
 	placeIcon(spellSlot: SpellSlot) {
 		spellSlot.spell = this;
 		if (this.spellSlot !== null)
@@ -66,6 +68,37 @@ class Spell {
 		this.spellSlot = spellSlot;
 		this.iconPos = spellSlot.slot.pos.clone();
 		this.icon.pos = spellSlot.slot.pos.clone();
+	}
+
+	startCooldown() {
+		if (this.cooldown !== null) {
+			this.cooldown.remaining = this.cooldown.base;
+			const cdLabel = new Label({
+				text: String(this.cooldown.base),
+				font: new Font({size: 16, color: Color.White}),
+				z: 1,
+			});
+			this.icon.addChild(cdLabel);
+		}
+	}
+
+	decrementCooldown() {
+		if (this.cooldown !== null && this.cooldown.remaining > 0) {
+			if (this.cooldown.remaining === 1)
+				this.resetCooldown();
+			else {
+				this.cooldown.remaining--;
+				const cdLabel = this.icon.children[0] as Label;
+				cdLabel.text = String(this.cooldown.remaining);
+			}
+		}
+	}
+
+	resetCooldown() {
+		if (this.cooldown !== null) {
+			this.cooldown.remaining = 0;
+			this.icon.removeChild(this.icon.children[0]);
+		}
 	}
 }
 
