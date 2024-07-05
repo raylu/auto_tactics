@@ -22,8 +22,6 @@ canvas#game {
 tooltip {
 	position: absolute;
 	pointer-events: none;
-	width: 200px;
-	height: 5em;
 	background-color: #111;
 	border: 1px solid #fc0;
 	padding: 4px 8px;

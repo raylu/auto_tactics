@@ -68,13 +68,16 @@ class Spell {
 			tooltip.innerHTML = `<b>${opts.name}</b>`;
 			if (this.cooldown !== null)
 				tooltip.innerHTML += `<br>cooldown: ${this.cooldown.base}`;
+			if (this.stats.freeze > 0)
+				tooltip.innerHTML += `<br>target gains +${this.stats.freeze}% freeze`;
 			tooltip.style.opacity = '0.9';
 		});
 		this.icon.on('pointerleave', () => {
 			tooltip.style.opacity = '0';
 		});
 		this.icon.on('pointermove', (event: PointerEvent) => {
-			tooltip.style.top = event.screenPos.y - 100 + 'px';
+			const height = tooltip.getBoundingClientRect().height;
+			tooltip.style.top = (event.screenPos.y - height - 4) + 'px';
 			tooltip.style.left = event.screenPos.x + 'px';
 		});
 		this.iconPos = vec(0, 0);
