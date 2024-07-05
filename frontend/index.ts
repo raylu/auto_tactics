@@ -101,14 +101,8 @@ start.addEventListener('click', () => {
 			}
 		} else {
 			blueWitch.graphics.use(witchAnims.idle);
-			if (enemy.resolveFreeze()) {
-				enemyAnims.idle.pause();
-				enemyAnims.idle.tint = Color.ExcaliburBlue;
-			} else {
+			if (!enemy.resolveFreeze()) {
 				enemyAnims.attack.reset();
-				enemyAnims.idle.play(); // unfreeze
-				// @ts-expect-error
-				enemyAnims.idle.tint = null;
 				enemy.graphics.use(enemyAnims.attack);
 				enemy.actions.runAction(enemyAttack);
 			}
@@ -122,9 +116,7 @@ start.addEventListener('click', () => {
 		scoreDisplay.pos.x = game.drawWidth - 10 - scoreDisplay.text.length * 15;
 		scoreDisplay.graphics.visible = true;
 
-		enemyAnims.idle.play(); // unfreeze
-		// @ts-expect-error
-		enemyAnims.idle.tint = null;
+		enemy.unfreeze();
 
 		for (const spell of spells)
 			spell.resetCooldown();
