@@ -145,7 +145,7 @@ function iceBlast(game: Engine, caster: Unit, target: Unit) {
 	iceBlastAnims.startup.events.once('end', () => {
 		iceBlastProj.graphics.use(iceBlastAnims.projectile);
 		caster.graphics.use(witchAnims.idle);
-		iceBlastProj.actions.moveTo(target.collider.bounds.center, 800);
+		iceBlastProj.actions.moveTo(target.pos.add(vec(-20, 0)), 800);
 	});
 	game.add(iceBlastProj);
 	iceBlastProj.events.on('actioncomplete', () => {
@@ -163,7 +163,7 @@ function iceBlast(game: Engine, caster: Unit, target: Unit) {
 function iceNova(game: Engine, caster: Unit, target: Unit) {
 	caster.graphics.use(witchAnims.charge);
 	const iceNovaVortex = new Actor({
-		pos: target.collider.bounds.center,
+		pos: target.pos,
 	});
 	iceNovaAnims.startup.reset();
 	iceNovaVortex.graphics.use(iceNovaAnims.startup);

@@ -31,7 +31,10 @@ game.add(background);
 
 const blueWitch = new Unit({
 	pos: vec(100, 150),
+	offset: vec(1, 0),
 	scale: vec(1.5, 1.5),
+	height: 40,
+	width: 24,
 });
 blueWitch.graphics.use(witchAnims.idle);
 game.add(blueWitch);
@@ -39,13 +42,13 @@ witchAnims.takeDamage.events.on('end', () => {
 	blueWitch.graphics.use(witchAnims.idle);
 });
 
-const ENEMY_START = vec(500, 150);
+const ENEMY_START = vec(500, 200);
 const enemy = new Unit({
 	pos: ENEMY_START,
-	anchor: vec(2 / 3, 0.5),
+	offset: vec(-4, -3),
 	scale: vec(2, 2),
-	width: 24,
-	height: enemyAnims.idle.height,
+	width: 22,
+	height: 36,
 });
 enemy.graphics.use(enemyAnims.idle);
 enemy.graphics.flipHorizontal = true;
@@ -121,7 +124,7 @@ start.addEventListener('click', () => {
 		for (const spell of spells)
 			spell.resetCooldown();
 		start.disabled = gameState.simulating = false;
-	}, 12000);
+	}, 16000);
 });
 
 void game.start(loader);
