@@ -1,16 +1,22 @@
 import {Actor, BaseAlign, Color, type Engine, Font, Label, type PointerEvent, range, ScreenElement, TextAlign,
 	type Vector, vec} from 'excalibur';
+
 import {blueWitchIconImg, iceBlastAnims, iceNovaAnims, spellIcons, witchAnims} from './sprites';
-import {iceSound, sndPlugin} from './sounds';
 import {gameState} from './state';
+import {iceSound, sndPlugin} from './sounds';
+import type {Unit} from './unit';
 
 interface SpellOpts {
 	name: string;
 	baseCooldown: number | null;
+	stats: Partial<SpellStats>;
 	icon: {x: number; y: number};
 	castFn: CastFn;
 }
-type CastFn = (game: Engine, caster: Actor, target: Actor) => void;
+interface SpellStats {
+	freeze: number;
+}
+type CastFn = (game: Engine, caster: Unit, target: Unit) => void;
 
 interface SpellSlot {
 	readonly slot: ScreenElement;
@@ -34,16 +40,20 @@ class Spell {
 	icon: ScreenElement;
 	iconPos: Vector;
 	spellSlot: SpellSlot | null = null;
+	stats: SpellStats;
 	cooldown: null | {
 		base: number;
 		remaining: number;
 	} = null;
-	castFn: CastFn;
+	private castFn: CastFn;
 
 	constructor(opts: SpellOpts) {
 		this.name = opts.name;
 		if (opts.baseCooldown !== null)
 			this.cooldown = {base: opts.baseCooldown, remaining: 0};
+		this.stats = {
+			freeze: opts.stats.freeze ?? 0,
+		};
 
 		const iconSprite = spellIcons.getSprite(opts.icon.x, opts.icon.y);
 		this.icon = new ScreenElement({
@@ -81,6 +91,12 @@ class Spell {
 		this.icon.pos = spellSlot.slot.pos.clone();
 	}
 
+	cast(game: Engine, caster: Unit, target: Unit) {
+		this.castFn(game, caster, target);
+		this.startCooldown();
+		target.freeze += this.stats.freeze;
+	}
+
 	startCooldown() {
 		if (this.cooldown !== null) {
 			this.cooldown.remaining = this.cooldown.base;
@@ -109,12 +125,12 @@ class Spell {
 	resetCooldown() {
 		if (this.cooldown !== null) {
 			this.cooldown.remaining = 0;
-			this.icon.removeChild(this.icon.children[0]);
+			this.icon.removeAllChildren();
 		}
 	}
 }
 
-function iceBlast(game: Engine, caster: Actor, target: Actor) {
+function iceBlast(game: Engine, caster: Unit, target: Unit) {
 	caster.graphics.use(witchAnims.charge);
 	const iceBlastProj = new Actor({
 		pos: caster.pos,
@@ -141,7 +157,7 @@ function iceBlast(game: Engine, caster: Actor, target: Actor) {
 	void iceSound.play(0.5);
 }
 
-function iceNova(game: Engine, caster: Actor, target: Actor) {
+function iceNova(game: Engine, caster: Unit, target: Unit) {
 	caster.graphics.use(witchAnims.charge);
 	const iceNovaVortex = new Actor({
 		pos: target.collider.bounds.center,
@@ -167,8 +183,19 @@ function iceNova(game: Engine, caster: Actor, target: Actor) {
 }
 
 export const spells = [
-	new Spell({name: 'ice blast', baseCooldown: null, icon: {x: 3, y: 2}, castFn: iceBlast}),
-	new Spell({name: 'ice nova', baseCooldown: 4, icon: {x: 4, y: 1}, castFn: iceNova}),
+	new Spell({name: 'ice blast',
+		baseCooldown: null,
+		stats: {freeze: 25},
+		icon: {x: 3, y: 2},
+		castFn: iceBlast,
+	}),
+	new Spell({
+		name: 'ice nova',
+		baseCooldown: 4,
+		stats: {},
+		icon: {x: 4, y: 1},
+		castFn: iceNova,
+	}),
 ];
 
 export const spellSlots = {

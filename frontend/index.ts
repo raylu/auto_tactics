@@ -1,10 +1,12 @@
+import {ActionContext, ActionSequence, Color, Engine, Font, Label, Random, TileMap, vec} from 'excalibur';
+
 import {score} from '../shared/score';
-import {sndPlugin} from './sounds';
-import {ActionContext, ActionSequence, Actor, Color, Engine, Font, Label, Random, TileMap, vec} from 'excalibur';
-import {enemyAnims, terrainGrass, witchAnims} from './sprites';
 import {loader} from './loader';
+import {sndPlugin} from './sounds';
 import {initSpells, spellSlots, spells} from './spells';
+import {enemyAnims, terrainGrass, witchAnims} from './sprites';
 import {gameState} from './state';
+import {Unit} from './unit';
 
 const game = new Engine({
 	canvasElement: document.querySelector('canvas#game') as HTMLCanvasElement,
@@ -27,7 +29,7 @@ for (const tile of background.tiles)
 	tile.addGraphic(terrainGrass.getSprite(random.integer(0, 3), random.integer(0, 1)));
 game.add(background);
 
-const blueWitch = new Actor({
+const blueWitch = new Unit({
 	pos: vec(100, 150),
 	scale: vec(1.5, 1.5),
 });
@@ -38,7 +40,7 @@ witchAnims.takeDamage.events.on('end', () => {
 });
 
 const ENEMY_START = vec(500, 150);
-const enemy = new Actor({
+const enemy = new Unit({
 	pos: ENEMY_START,
 	anchor: vec(2 / 3, 0.5),
 	scale: vec(2, 2),
@@ -85,22 +87,25 @@ start.addEventListener('click', () => {
 	let playerTurn = true;
 	const interval = setInterval(() => {
 		if (playerTurn) {
-			let casted = false;
-			for (const {spell} of spellSlots.blueWitch) {
-				if (spell === null)
-					continue;
-				if (!casted && (spell.cooldown?.remaining ?? 0) == 0) {
-					spell.castFn(game, blueWitch, enemy);
-					spell.startCooldown();
-					casted = true;
-				} else
-					spell.decrementCooldown();
+			if (!blueWitch.resolveFreeze()) {
+				let casted = false;
+				for (const {spell} of spellSlots.blueWitch) {
+					if (spell === null)
+						continue;
+					if (!casted && (spell.cooldown?.remaining ?? 0) == 0) {
+						spell.cast(game, blueWitch, enemy);
+						casted = true;
+					} else
+						spell.decrementCooldown();
+				}
 			}
 		} else {
 			blueWitch.graphics.use(witchAnims.idle);
-			enemyAnims.attack.reset();
-			enemy.graphics.use(enemyAnims.attack);
-			enemy.actions.runAction(enemyAttack);
+			if (!enemy.resolveFreeze()) {
+				enemyAnims.attack.reset();
+				enemy.graphics.use(enemyAnims.attack);
+				enemy.actions.runAction(enemyAttack);
+			}
 		}
 		playerTurn = !playerTurn;
 	}, 1500);
