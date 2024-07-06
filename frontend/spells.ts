@@ -17,7 +17,7 @@ interface SpellStats {
 	damage: number;
 	freeze: number;
 }
-type CastFn = (game: Engine, caster: Unit, target: Unit) => void;
+type CastFn = (game: Engine, caster: Unit, target: Unit) => Promise<void>;
 
 interface SpellSlot {
 	readonly slot: ScreenElement;
@@ -96,9 +96,9 @@ class Spell {
 		this.icon.pos = spellSlot.slot.pos.clone();
 	}
 
-	cast(game: Engine, caster: Unit, target: Unit) {
-		this.castFn(game, caster, target);
+	async cast(game: Engine, caster: Unit, target: Unit) {
 		this.startCooldown();
+		await this.castFn(game, caster, target);
 		target.setHealth(Math.max(target.health - this.stats.damage, 0));
 		target.freeze += this.stats.freeze;
 	}
@@ -136,7 +136,7 @@ class Spell {
 	}
 }
 
-function iceBlast(game: Engine, caster: Unit, target: Unit) {
+function iceBlast(game: Engine, caster: Unit, target: Unit): Promise<void> {
 	caster.graphics.use(witchAnims.charge);
 	const iceBlastProj = new Actor({
 		pos: caster.pos,
@@ -151,6 +151,7 @@ function iceBlast(game: Engine, caster: Unit, target: Unit) {
 		iceBlastProj.actions.moveTo(target.pos.add(vec(-20, 0)), 800);
 	});
 	game.add(iceBlastProj);
+	const {promise, resolve} = Promise.withResolvers<void>();
 	iceBlastProj.events.on('actioncomplete', () => {
 		iceBlastAnims.impact.reset();
 		iceBlastProj.graphics.use(iceBlastAnims.impact);
@@ -159,11 +160,13 @@ function iceBlast(game: Engine, caster: Unit, target: Unit) {
 	});
 	iceBlastAnims.impact.events.once('end', () => {
 		iceBlastProj.kill();
+		resolve();
 	});
 	void iceSound.play(0.5);
+	return promise;
 }
 
-function iceNova(game: Engine, caster: Unit, target: Unit) {
+function iceNova(game: Engine, caster: Unit, target: Unit): Promise<void> {
 	caster.graphics.use(witchAnims.charge);
 	const iceNovaVortex = new Actor({
 		pos: target.pos,
@@ -181,17 +184,20 @@ function iceNova(game: Engine, caster: Unit, target: Unit) {
 		sndPlugin.playSound('spellBig');
 		iceSound.volume = 0.1;
 	});
+	const {promise, resolve} = Promise.withResolvers<void>();
 	iceNovaAnims.end.events.once('end', () => {
 		iceNovaVortex.kill();
+		resolve();
 	});
 	game.add(iceNovaVortex);
 	void iceSound.play(0.5);
+	return promise;
 }
 
 export const spells = [
 	new Spell({name: 'ice blast',
 		baseCooldown: null,
-		stats: {damage: 25, freeze: 25},
+		stats: {damage: 25, freeze: 40},
 		icon: {x: 3, y: 2},
 		castFn: iceBlast,
 	}),

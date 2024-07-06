@@ -1,4 +1,5 @@
-import {ActionContext, ActionSequence, Color, Engine, Font, Label, Random, TileMap, vec} from 'excalibur';
+import {ActionContext, ActionSequence, Color, Engine, Font, Label, Random, TileMap, vec,
+	type ActionCompleteEvent} from 'excalibur';
 
 import {score} from '../shared/score';
 import {loader} from './loader';
@@ -53,7 +54,7 @@ const enemy = new Unit({
 enemy.graphics.use(enemyAnims.idle);
 enemy.graphics.flipHorizontal = true;
 game.add(enemy);
-const enemyAttack = new ActionSequence(enemy, (ctx: ActionContext) => {
+const enemyAttackSequence = new ActionSequence(enemy, (ctx: ActionContext) => {
 	ctx
 		.moveTo(vec(blueWitch.pos.x + 60, blueWitch.pos.y), 1000)
 		.delay(200)
@@ -68,6 +69,17 @@ const enemyAttack = new ActionSequence(enemy, (ctx: ActionContext) => {
 			enemy.graphics.use(enemyAnims.idle);
 		});
 });
+function enemyAttack(): Promise<void> {
+	enemyAnims.attack.reset();
+	enemy.graphics.use(enemyAnims.attack);
+	enemy.actions.runAction(enemyAttackSequence);
+	const {promise, resolve} = Promise.withResolvers<void>();
+	enemy.on('actioncomplete', (event: ActionCompleteEvent) => {
+		if (event.action === enemyAttackSequence)
+			resolve();
+	});
+	return promise;
+}
 
 const scoreDisplay = new Label({
 	visible: false,
@@ -82,13 +94,14 @@ const start = document.querySelector('button#start') as HTMLButtonElement;
 game.on('initialize', () => {
 	start.style.display = 'block';
 });
-start.addEventListener('click', () => {
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
+start.addEventListener('click', async () => {
 	if (gameState.simulating)
 		return;
 	start.disabled = gameState.simulating = true;
 
 	let playerTurn = true;
-	const interval = setInterval(() => {
+	while (blueWitch.health > 0 && enemy.health > 0) {
 		if (playerTurn) {
 			if (!blueWitch.resolveFreeze()) {
 				let casted = false;
@@ -96,7 +109,7 @@ start.addEventListener('click', () => {
 					if (spell === null)
 						continue;
 					if (!casted && (spell.cooldown?.remaining ?? 0) == 0) {
-						spell.cast(game, blueWitch, enemy);
+						await spell.cast(game, blueWitch, enemy);
 						casted = true;
 					} else
 						spell.decrementCooldown();
@@ -104,27 +117,21 @@ start.addEventListener('click', () => {
 			}
 		} else {
 			blueWitch.graphics.use(witchAnims.idle);
-			if (!enemy.resolveFreeze()) {
-				enemyAnims.attack.reset();
-				enemy.graphics.use(enemyAnims.attack);
-				enemy.actions.runAction(enemyAttack);
-			}
+			if (!enemy.resolveFreeze())
+				await enemyAttack();
 		}
 		playerTurn = !playerTurn;
-	}, 1500);
+	}
 
-	setTimeout(() => {
-		clearInterval(interval);
-		scoreDisplay.text = String(score());
-		scoreDisplay.pos.x = game.drawWidth - 10 - scoreDisplay.text.length * 15;
-		scoreDisplay.graphics.visible = true;
+	scoreDisplay.text = String(score());
+	scoreDisplay.pos.x = game.drawWidth - 10 - scoreDisplay.text.length * 15;
+	scoreDisplay.graphics.visible = true;
 
-		enemy.reset();
+	enemy.reset();
 
-		for (const spell of spells)
-			spell.resetCooldown();
-		start.disabled = gameState.simulating = false;
-	}, 16000);
+	for (const spell of spells)
+		spell.resetCooldown();
+	start.disabled = gameState.simulating = false;
 });
 
 void game.start(loader);
