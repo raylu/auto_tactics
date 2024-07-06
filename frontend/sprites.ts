@@ -1,4 +1,4 @@
-import {Animation, AnimationStrategy, ImageSource, SpriteSheet, range, type Loadable} from 'excalibur';
+import {Animation, AnimationStrategy, ImageSource, type Loadable, SpriteSheet, range} from 'excalibur';
 import {loader} from './loader';
 
 const resources: Loadable<any>[] = [];

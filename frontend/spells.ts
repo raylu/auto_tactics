@@ -1,9 +1,9 @@
-import {Actor, BaseAlign, Color, type Engine, Font, Label, type PointerEvent, range, ScreenElement, TextAlign,
-	type Vector, vec} from 'excalibur';
+import {Actor, BaseAlign, Color, type Engine, Font, Label, type PointerEvent, range, ScreenElement, TextAlign, vec,
+	type Vector} from 'excalibur';
 
+import {iceSound, sndPlugin} from './sounds';
 import {blueWitchIconImg, iceBlastAnims, iceNovaAnims, spellIcons, witchAnims} from './sprites';
 import {gameState} from './state';
-import {iceSound, sndPlugin} from './sounds';
 import type {Unit} from './unit';
 
 interface SpellOpts {

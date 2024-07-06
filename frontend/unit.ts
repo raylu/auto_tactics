@@ -1,5 +1,5 @@
-import {Actor, type ActorArgs, type Animation, Color, Debug, type ExcaliburGraphicsContext, Engine, type Rectangle,
-	vec, Vector} from 'excalibur';
+import {Actor, type ActorArgs, type Animation, Color, Debug, Engine, type ExcaliburGraphicsContext, type Rectangle,
+	Vector, vec} from 'excalibur';
 
 export class Unit extends Actor {
 	maxHP: number;
