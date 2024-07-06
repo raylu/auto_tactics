@@ -75,8 +75,10 @@ function enemyAttack(): Promise<void> {
 	enemy.actions.runAction(enemyAttackSequence);
 	const {promise, resolve} = Promise.withResolvers<void>();
 	enemy.on('actioncomplete', (event: ActionCompleteEvent) => {
-		if (event.action === enemyAttackSequence)
+		if (event.action === enemyAttackSequence) {
+			blueWitch.setHealth(blueWitch.health - 10);
 			resolve();
+		}
 	});
 	return promise;
 }
@@ -127,6 +129,7 @@ start.addEventListener('click', async () => {
 	scoreDisplay.pos.x = game.drawWidth - 10 - scoreDisplay.text.length * 15;
 	scoreDisplay.graphics.visible = true;
 
+	blueWitch.reset();
 	enemy.reset();
 
 	for (const spell of spells)
