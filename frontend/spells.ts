@@ -14,6 +14,7 @@ interface SpellOpts {
 	castFn: CastFn;
 }
 interface SpellStats {
+	damage: number;
 	freeze: number;
 }
 type CastFn = (game: Engine, caster: Unit, target: Unit) => void;
@@ -52,6 +53,7 @@ class Spell {
 		if (opts.baseCooldown !== null)
 			this.cooldown = {base: opts.baseCooldown, remaining: 0};
 		this.stats = {
+			damage: opts.stats.damage ?? 0,
 			freeze: opts.stats.freeze ?? 0,
 		};
 
@@ -97,6 +99,7 @@ class Spell {
 	cast(game: Engine, caster: Unit, target: Unit) {
 		this.castFn(game, caster, target);
 		this.startCooldown();
+		target.setHealth(Math.max(target.health - this.stats.damage, 0));
 		target.freeze += this.stats.freeze;
 	}
 
@@ -188,14 +191,14 @@ function iceNova(game: Engine, caster: Unit, target: Unit) {
 export const spells = [
 	new Spell({name: 'ice blast',
 		baseCooldown: null,
-		stats: {freeze: 25},
+		stats: {damage: 25, freeze: 25},
 		icon: {x: 3, y: 2},
 		castFn: iceBlast,
 	}),
 	new Spell({
 		name: 'ice nova',
 		baseCooldown: 4,
-		stats: {},
+		stats: {damage: 10},
 		icon: {x: 4, y: 1},
 		castFn: iceNova,
 	}),

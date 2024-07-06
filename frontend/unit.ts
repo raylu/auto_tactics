@@ -1,17 +1,22 @@
-import {Actor, type ActorArgs, type Animation, Color, vec, Engine, Debug, Vector} from 'excalibur';
+import {Actor, type ActorArgs, type Animation, Color, vec, Engine, Debug, Vector, type Rectangle} from 'excalibur';
 
 export class Unit extends Actor {
+	maxHP: number;
+	health: number;
+	healthBar: Actor;
 	freeze = 0;
 
-	constructor(config: ActorArgs & {height: number}) {
+	constructor(config: ActorArgs & {height: number}, maxHP: number) {
 		super(config);
-		const healthBar = new Actor({
+
+		this.maxHP = this.health = maxHP;
+		this.healthBar = new Actor({
 			width: 20,
 			height: 5,
 			color: Color.Chartreuse,
 			pos: vec(0, -config.height / 2 - 6),
 		});
-		this.addChild(healthBar);
+		this.addChild(this.healthBar);
 	}
 
 	onPostUpdate(engine: Engine<any>, delta: number): void {
@@ -32,6 +37,11 @@ export class Unit extends Actor {
 		Debug.drawBounds(this.collider.bounds, {color: Color.Yellow});
 	}
 
+	setHealth(health: number) {
+		this.health = health;
+		(this.healthBar.graphics.current as Rectangle).width = this.health / this.maxHP * 20;
+	}
+
 	resolveFreeze(): boolean {
 		const animation = this.graphics.current as Animation;
 		if (this.freeze >= 100) {
@@ -50,5 +60,10 @@ export class Unit extends Actor {
 		// @ts-expect-error
 		animation.tint = null;
 		animation.play();
+	}
+
+	reset() {
+		this.setHealth(this.maxHP);
+		this.unfreeze();
 	}
 }

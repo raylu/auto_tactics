@@ -35,7 +35,7 @@ const blueWitch = new Unit({
 	scale: vec(1.5, 1.5),
 	height: 40,
 	width: 24,
-});
+}, 50);
 blueWitch.graphics.use(witchAnims.idle);
 game.add(blueWitch);
 witchAnims.takeDamage.events.on('end', () => {
@@ -49,7 +49,7 @@ const enemy = new Unit({
 	scale: vec(2, 2),
 	width: 22,
 	height: 36,
-});
+}, 100);
 enemy.graphics.use(enemyAnims.idle);
 enemy.graphics.flipHorizontal = true;
 game.add(enemy);
@@ -119,7 +119,7 @@ start.addEventListener('click', () => {
 		scoreDisplay.pos.x = game.drawWidth - 10 - scoreDisplay.text.length * 15;
 		scoreDisplay.graphics.visible = true;
 
-		enemy.unfreeze();
+		enemy.reset();
 
 		for (const spell of spells)
 			spell.resetCooldown();
