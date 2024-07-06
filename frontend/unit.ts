@@ -1,21 +1,28 @@
-import {Actor, type ActorArgs, type Animation, Color, vec, Engine, Debug, Vector, type Rectangle} from 'excalibur';
+import {Actor, type ActorArgs, type Animation, Color, Debug, type ExcaliburGraphicsContext, Engine, type Rectangle,
+	vec, Vector} from 'excalibur';
 
 export class Unit extends Actor {
 	maxHP: number;
 	health: number;
 	healthBar: Actor;
+	barMaxWidth: number;
 	freeze = 0;
 
-	constructor(config: ActorArgs & {height: number}, maxHP: number) {
+	constructor(config: ActorArgs & {width: number, height: number}, maxHP: number) {
 		super(config);
 
 		this.maxHP = this.health = maxHP;
+		this.barMaxWidth = config.width - 1;
 		this.healthBar = new Actor({
-			width: 20,
+			width: this.barMaxWidth,
 			height: 5,
 			color: Color.Chartreuse,
-			pos: vec(0, -config.height / 2 - 6),
+			pos: vec(-config.width / 2 + 1, -config.height / 2 - 6),
+			anchor: vec(0, 1),
 		});
+		this.healthBar.graphics.onPostDraw = (gfx: ExcaliburGraphicsContext) => {
+			gfx.drawRectangle(vec(0, -6), config.width, 7, Color.Transparent, Color.fromRGB(100, 200, 100), 1);
+		};
 		this.addChild(this.healthBar);
 	}
 
@@ -39,7 +46,7 @@ export class Unit extends Actor {
 
 	setHealth(health: number) {
 		this.health = health;
-		(this.healthBar.graphics.current as Rectangle).width = this.health / this.maxHP * 20;
+		(this.healthBar.graphics.current as Rectangle).width = this.health / this.maxHP * this.barMaxWidth;
 	}
 
 	resolveFreeze(): boolean {
