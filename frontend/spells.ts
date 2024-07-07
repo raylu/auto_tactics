@@ -100,7 +100,10 @@ class Spell {
 		this.startCooldown();
 		await this.castFn(game, caster, target);
 		target.setHealth(Math.max(target.health - this.stats.damage, 0));
-		target.freeze += this.stats.freeze;
+		if (target.health === 0)
+			await target.die();
+		else
+			target.freeze += this.stats.freeze;
 	}
 
 	startCooldown() {

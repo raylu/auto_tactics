@@ -20,6 +20,7 @@ export const witchAnims = {
 	idle: witchAnimation('idle', 6, 32),
 	charge: witchAnimation('charge', 5, 48),
 	takeDamage: witchAnimation('take_damage', 3, 32, AnimationStrategy.Freeze),
+	death: witchAnimation('death', 12, 32, AnimationStrategy.Freeze),
 } as const;
 export const blueWitchIconImg = new ImageSource('static/sprites/blue_witch/icon.gif');
 
@@ -36,6 +37,7 @@ const enemySprites = SpriteSheet.fromImageSource({
 export const enemyAnims = {
 	idle: Animation.fromSpriteSheet(enemySprites, range(0, 5), 100),
 	attack: Animation.fromSpriteSheet(enemySprites, range(6, 25), 50, AnimationStrategy.Freeze),
+	death: Animation.fromSpriteSheet(enemySprites, range(26, 36), 150, AnimationStrategy.Freeze),
 } as const;
 
 const terrainGrassImg = new ImageSource('static/sprites/terrain/tileset_grass.png');

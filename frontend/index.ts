@@ -1,5 +1,4 @@
-import {ActionContext, ActionSequence, Color, Engine, Font, Label, Random, TileMap, vec,
-	type ActionCompleteEvent} from 'excalibur';
+import {Color, Engine, Font, Label, Random, TileMap, vec} from 'excalibur';
 
 import {score} from '../shared/score';
 import {loader} from './loader';
@@ -36,7 +35,7 @@ const blueWitch = new Unit({
 	scale: vec(1.5, 1.5),
 	height: 40,
 	width: 24,
-}, 50);
+}, {maxHP: 50, idleAnimation: witchAnims.idle, deathAnimation: witchAnims.death});
 blueWitch.graphics.use(witchAnims.idle);
 game.add(blueWitch);
 witchAnims.takeDamage.events.on('end', () => {
@@ -50,12 +49,15 @@ const enemy = new Unit({
 	scale: vec(2, 2),
 	width: 22,
 	height: 36,
-}, 100);
+}, {maxHP: 100, idleAnimation: enemyAnims.idle, deathAnimation: enemyAnims.death});
 enemy.graphics.use(enemyAnims.idle);
 enemy.graphics.flipHorizontal = true;
 game.add(enemy);
-const enemyAttackSequence = new ActionSequence(enemy, (ctx: ActionContext) => {
-	ctx
+function enemyAttack(): Promise<void> {
+	enemyAnims.attack.reset();
+	enemy.graphics.use(enemyAnims.attack);
+	const {promise, resolve} = Promise.withResolvers<void>();
+	enemy.actions
 		.moveTo(vec(blueWitch.pos.x + 60, blueWitch.pos.y), 1000)
 		.delay(200)
 		.callMethod(() => {
@@ -67,19 +69,12 @@ const enemyAttackSequence = new ActionSequence(enemy, (ctx: ActionContext) => {
 		.moveTo(ENEMY_START, 2000)
 		.callMethod(() => {
 			enemy.graphics.use(enemyAnims.idle);
-		});
-});
-function enemyAttack(): Promise<void> {
-	enemyAnims.attack.reset();
-	enemy.graphics.use(enemyAnims.attack);
-	enemy.actions.runAction(enemyAttackSequence);
-	const {promise, resolve} = Promise.withResolvers<void>();
-	enemy.on('actioncomplete', (event: ActionCompleteEvent) => {
-		if (event.action === enemyAttackSequence) {
 			blueWitch.setHealth(blueWitch.health - 10);
-			resolve();
-		}
-	});
+			if (blueWitch.health === 0)
+				void blueWitch.die().then(resolve);
+			else
+				resolve();
+		});
 	return promise;
 }
 

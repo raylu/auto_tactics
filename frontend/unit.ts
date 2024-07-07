@@ -1,17 +1,25 @@
 import {Actor, type ActorArgs, type Animation, Color, Debug, Engine, type ExcaliburGraphicsContext, type Rectangle,
 	Vector, vec} from 'excalibur';
 
+interface UnitConfig {
+	maxHP: number;
+	idleAnimation: Animation;
+	deathAnimation: Animation;
+}
+
 export class Unit extends Actor {
 	maxHP: number;
 	health: number;
 	healthBar: Actor;
 	barMaxWidth: number;
 	freeze = 0;
+	idleAnimation: Animation;
+	deathAnimation: Animation;
 
-	constructor(config: ActorArgs & {width: number, height: number}, maxHP: number) {
+	constructor(config: ActorArgs & {width: number, height: number}, unitConfig: UnitConfig) {
 		super(config);
 
-		this.maxHP = this.health = maxHP;
+		this.maxHP = this.health = unitConfig.maxHP;
 		this.barMaxWidth = config.width - 1;
 		this.healthBar = new Actor({
 			width: this.barMaxWidth,
@@ -24,6 +32,9 @@ export class Unit extends Actor {
 			gfx.drawRectangle(vec(0, -6), config.width, 7, Color.Transparent, Color.fromRGB(100, 200, 100), 1);
 		};
 		this.addChild(this.healthBar);
+
+		this.idleAnimation = unitConfig.idleAnimation;
+		this.deathAnimation = unitConfig.deathAnimation;
 	}
 
 	onPostUpdate(engine: Engine<any>, delta: number): void {
@@ -71,6 +82,19 @@ export class Unit extends Actor {
 
 	reset() {
 		this.setHealth(this.maxHP);
+		this.freeze = 0;
 		this.unfreeze();
+		this.graphics.use(this.idleAnimation);
+	}
+
+	die(): Promise<void> {
+		this.unfreeze();
+		this.deathAnimation.reset();
+		this.graphics.use(this.deathAnimation);
+		const {promise, resolve} = Promise.withResolvers<void>();
+		this.deathAnimation.events.once('end', () => {
+			resolve();
+		});
+		return promise;
 	}
 }
