@@ -1,5 +1,5 @@
-import {Actor, BaseAlign, Color, type Engine, Font, Label, type PointerEvent, range, ScreenElement, TextAlign, vec,
-	type Vector} from 'excalibur';
+import {Actor, BaseAlign, Color, type Engine, Font, Label, type PointerEvent, ScreenElement, TextAlign, type Vector,
+	range, vec} from 'excalibur';
 
 import {iceSound, sndPlugin} from './sounds';
 import {blueWitchIconImg, iceBlastAnims, iceNovaAnims, spellIcons, witchAnims} from './sprites';

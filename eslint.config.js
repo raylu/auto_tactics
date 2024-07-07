@@ -23,6 +23,7 @@ const configs = [
 			'prefer-const': ['error', {'destructuring': 'all'}],
 			'quotes': ['error', 'single'],
 			'semi': ['error', 'always'],
+			'sort-imports': ['error', {'ignoreDeclarationSort': true}],
 			'space-infix-ops': ['error'],
 			'@typescript-eslint/ban-ts-comment': 'off',
 			'@typescript-eslint/no-explicit-any': 'off',
