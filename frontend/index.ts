@@ -1,4 +1,4 @@
-import {Color, Engine, Font, Label, Random, TileMap, vec} from 'excalibur';
+import {Color, DisplayMode, Engine, Font, Label, Random, TileMap, vec} from 'excalibur';
 
 import {score} from '../shared/score';
 import {loader} from './loader';
@@ -12,6 +12,7 @@ const game = new Engine({
 	canvasElement: document.querySelector('canvas#game') as HTMLCanvasElement,
 	width: 640,
 	height: 640,
+	displayMode: DisplayMode.FitContainer,
 	backgroundColor: Color.fromRGB(50, 0, 50),
 	pixelArt: true,
 	suppressConsoleBootMessage: true,

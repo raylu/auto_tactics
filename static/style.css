@@ -46,9 +46,12 @@ button#start:disabled {
 }
 
 main, footer {
-	position: relative;
 	width: 640px;
 	margin: 100px auto;
+}
+main {
+	position: relative;
+	height: 640px;
 }
 main a {
 	display: block;
