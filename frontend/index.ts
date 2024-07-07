@@ -1,4 +1,4 @@
-import {Color, DisplayMode, Engine, Font, Label, Random, TileMap, vec} from 'excalibur';
+import {Color, DisplayMode, Engine, Font, Label, Random, TextAlign, TileMap, vec} from 'excalibur';
 
 import {score} from '../shared/score';
 import {loader} from './loader';
@@ -85,10 +85,22 @@ const scoreDisplay = new Label({
 	font: new Font({size: 24}),
 });
 game.add(scoreDisplay);
+const endText = new Label({
+	pos: vec(game.drawWidth / 2, game.drawHeight / 2 - 50),
+	font: new Font({
+		family: 'Metrophobic',
+		bold: true,
+		size: 48,
+		textAlign: TextAlign.Center,
+		shadow: {offset: vec(1, 1), color: Color.Black},
+	}),
+});
+game.add(endText);
 
 initSpells(game);
 
 const start = document.querySelector('button#start') as HTMLButtonElement;
+const restart = document.querySelector('button#restart') as HTMLButtonElement;
 game.on('initialize', () => {
 	start.style.display = 'block';
 });
@@ -127,11 +139,23 @@ start.addEventListener('click', async () => {
 	scoreDisplay.pos.x = game.drawWidth - 10 - scoreDisplay.text.length * 15;
 	scoreDisplay.graphics.visible = true;
 
+	if (enemy.health === 0) {
+		endText.text = 'victory!';
+		endText.font.color = Color.fromRGB(96, 255, 128);
+	} else {
+		endText.text = 'defeat';
+		endText.font.color = Color.fromRGB(255, 96, 128);
+	}
+	restart.style.display = 'block';
+});
+restart.addEventListener('click', () => {
 	blueWitch.reset();
 	enemy.reset();
 
 	for (const spell of spells)
 		spell.resetCooldown();
+	endText.text = '';
+	restart.style.display = 'none';
 	start.disabled = gameState.simulating = false;
 });
 

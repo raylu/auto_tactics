@@ -28,21 +28,35 @@ tooltip {
 	opacity: 0;
 	transition: opacity 0.25s;
 }
-button#start {
+button {
 	display: none;
 	position: absolute;
-	bottom: 20px;
-	right: 20px;
+	font-family: inherit;
 	font-size: 24px;
+	font-weight: bold;
 	padding: 4px 16px;
 	border: 1px solid #eee;
-	background-color: #c68;
 	color: #111;
 }
-button#start:disabled {
-	background-color: #a79;
+button:disabled {
 	border-color: #aaa;
 	color: #444;
+}
+button#start {
+	bottom: 20px;
+	right: 20px;
+	background-color: #6c8;
+}
+button#start:disabled {
+	background-color: #7a9;
+}
+button#restart {
+	bottom: 70px;
+	right: 20px;
+	background-color: #c68;
+}
+button#restart:disabled {
+	background-color: #a79;
 }
 
 main, footer {
