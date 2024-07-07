@@ -35,7 +35,7 @@ const blueWitch = new Unit({
 	scale: vec(1.5, 1.5),
 	height: 40,
 	width: 24,
-}, {maxHP: 50, idleAnimation: witchAnims.idle, deathAnimation: witchAnims.death});
+}, {maxHP: 40, idleAnimation: witchAnims.idle, deathAnimation: witchAnims.death});
 blueWitch.graphics.use(witchAnims.idle);
 game.add(blueWitch);
 witchAnims.takeDamage.events.on('end', () => {

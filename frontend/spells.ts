@@ -15,6 +15,7 @@ interface SpellOpts {
 }
 interface SpellStats {
 	damage: number;
+	targetFrozenDamageMultiplier: number;
 	freeze: number;
 }
 type CastFn = (game: Engine, caster: Unit, target: Unit) => Promise<void>;
@@ -54,6 +55,7 @@ class Spell {
 			this.cooldown = {base: opts.baseCooldown, remaining: 0};
 		this.stats = {
 			damage: opts.stats.damage ?? 0,
+			targetFrozenDamageMultiplier: opts.stats.targetFrozenDamageMultiplier ?? 1,
 			freeze: opts.stats.freeze ?? 0,
 		};
 
@@ -70,6 +72,9 @@ class Spell {
 			tooltip.innerHTML = `<b>${opts.name}</b>`;
 			if (this.cooldown !== null)
 				tooltip.innerHTML += `<br>cooldown: ${this.cooldown.base}`;
+			tooltip.innerHTML += `<br>damage: ${this.stats.damage}`;
+			if (this.stats.targetFrozenDamageMultiplier !== 1)
+				tooltip.innerHTML += `<br>${this.stats.targetFrozenDamageMultiplier}× damage multiplier to frozen targets`;
 			if (this.stats.freeze > 0)
 				tooltip.innerHTML += `<br>target gains +${this.stats.freeze}% freeze`;
 			tooltip.style.opacity = '0.9';
@@ -99,11 +104,13 @@ class Spell {
 	async cast(game: Engine, caster: Unit, target: Unit) {
 		this.startCooldown();
 		await this.castFn(game, caster, target);
-		target.setHealth(Math.max(target.health - this.stats.damage, 0));
+		target.freeze += this.stats.freeze;
+		let damage = this.stats.damage;
+		if (target.freeze > 100)
+			damage *= this.stats.targetFrozenDamageMultiplier;
+		target.setHealth(Math.max(target.health - damage, 0));
 		if (target.health === 0)
 			await target.die();
-		else
-			target.freeze += this.stats.freeze;
 	}
 
 	startCooldown() {
@@ -200,14 +207,14 @@ function iceNova(game: Engine, caster: Unit, target: Unit): Promise<void> {
 export const spells = [
 	new Spell({name: 'ice blast',
 		baseCooldown: null,
-		stats: {damage: 25, freeze: 40},
+		stats: {damage: 20, freeze: 25},
 		icon: {x: 3, y: 2},
 		castFn: iceBlast,
 	}),
 	new Spell({
 		name: 'ice nova',
 		baseCooldown: 4,
-		stats: {damage: 10},
+		stats: {damage: 10, targetFrozenDamageMultiplier: 5},
 		icon: {x: 4, y: 1},
 		castFn: iceNova,
 	}),
