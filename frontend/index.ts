@@ -3,7 +3,7 @@ import {Color, DisplayMode, Engine, Font, Label, Random, TileMap, vec} from 'exc
 import {score} from '../shared/score';
 import {loader} from './loader';
 import {sndPlugin} from './sounds';
-import {initSpells, spellSlots, spells} from './spells';
+import {SLOT_DEFAULT_COLOR, initSpells, spellSlots, spells} from './spells';
 import {enemyAnims, terrainGrass, witchAnims} from './sprites';
 import {gameState} from './state';
 import {Unit} from './unit';
@@ -103,11 +103,13 @@ start.addEventListener('click', async () => {
 		if (playerTurn) {
 			if (!blueWitch.resolveFreeze()) {
 				let casted = false;
-				for (const {spell} of spellSlots.blueWitch) {
+				for (const {spell, slot} of spellSlots.blueWitch) {
 					if (spell === null)
 						continue;
 					if (!casted && (spell.cooldown?.remaining ?? 0) == 0) {
+						slot.color = Color.Viridian;
 						await spell.cast(game, blueWitch, enemy);
+						slot.color = SLOT_DEFAULT_COLOR;
 						casted = true;
 					} else
 						spell.decrementCooldown();

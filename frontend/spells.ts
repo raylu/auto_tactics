@@ -225,6 +225,8 @@ export const spellSlots = {
 	blueWitch: [] as SpellSlot[],
 };
 
+export const SLOT_DEFAULT_COLOR = Color.fromRGB(92, 97, 128);
+
 export function initSpells(game: Engine) {
 	game.add(new ScreenElement({ // spell bar background
 		color: Color.fromRGB(0, 0, 0),
@@ -265,7 +267,7 @@ export function initSpells(game: Engine) {
 	}));
 	spellSlots.blueWitch = range(0, 2).map((i) => {
 		const slot = new ScreenElement({
-			color: Color.fromRGB(92, 97, 128),
+			color: SLOT_DEFAULT_COLOR,
 			height: 40,
 			width: 40,
 			pos: vec(105 + i * 50, game.drawHeight - 70),
