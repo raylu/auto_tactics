@@ -3,26 +3,30 @@ import {loader} from './loader';
 
 const resources: Loadable<any>[] = [];
 
-function witchAnimation(name: string, rows: number, width: number, strategy?: AnimationStrategy) {
-	const image = new ImageSource(`static/sprites/blue_witch/${name}.png`);
+function witchAnimation(name: string, rows: number, width: number, height: number, strategy?: AnimationStrategy) {
+	const image = new ImageSource(`static/sprites/${name}.png`);
 	resources.push(image);
 	return Animation.fromSpriteSheet(SpriteSheet.fromImageSource({
 		image,
 		grid: {
 			rows,
 			columns: 1,
-			spriteHeight: 48,
+			spriteHeight: height,
 			spriteWidth: width,
 		},
 	}), range(0, rows - 1), 100, strategy);
 }
-export const witchAnims = {
-	idle: witchAnimation('idle', 6, 32),
-	charge: witchAnimation('charge', 5, 48),
-	takeDamage: witchAnimation('take_damage', 3, 32, AnimationStrategy.Freeze),
-	death: witchAnimation('death', 12, 32, AnimationStrategy.Freeze),
+export const blueWitchAnims = {
+	idle: witchAnimation('blue_witch/idle', 6, 32, 48),
+	charge: witchAnimation('blue_witch/charge', 5, 48, 48),
+	takeDamage: witchAnimation('blue_witch/take_damage', 3, 32, 48, AnimationStrategy.Freeze),
+	death: witchAnimation('blue_witch/death', 12, 32, 48, AnimationStrategy.Freeze),
 } as const;
 export const blueWitchIconImg = new ImageSource('static/sprites/blue_witch/icon.gif');
+export const redWitchAnims = {
+	idle: witchAnimation('red_witch/idle', 6, 32, 64),
+	death: witchAnimation('red_witch/death', 14, 45, 64, AnimationStrategy.Freeze),
+} as const;
 
 const enemyImg = new ImageSource('static/sprites/enemy.png');
 const enemySprites = SpriteSheet.fromImageSource({

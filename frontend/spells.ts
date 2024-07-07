@@ -2,7 +2,7 @@ import {Actor, BaseAlign, Color, type Engine, Font, Label, type PointerEvent, Sc
 	range, vec} from 'excalibur';
 
 import {iceSound, sndPlugin} from './sounds';
-import {blueWitchIconImg, iceBlastAnims, iceNovaAnims, spellIcons, witchAnims} from './sprites';
+import {blueWitchAnims, blueWitchIconImg, iceBlastAnims, iceNovaAnims, spellIcons} from './sprites';
 import {gameState} from './state';
 import type {Unit} from './unit';
 
@@ -147,7 +147,7 @@ class Spell {
 }
 
 function iceBlast(game: Engine, caster: Unit, target: Unit): Promise<void> {
-	caster.graphics.use(witchAnims.charge);
+	caster.graphics.use(blueWitchAnims.charge);
 	const iceBlastProj = new Actor({
 		pos: caster.pos,
 		width: iceBlastAnims.projectile.width,
@@ -157,7 +157,7 @@ function iceBlast(game: Engine, caster: Unit, target: Unit): Promise<void> {
 	iceBlastProj.graphics.use(iceBlastAnims.startup);
 	iceBlastAnims.startup.events.once('end', () => {
 		iceBlastProj.graphics.use(iceBlastAnims.projectile);
-		caster.graphics.use(witchAnims.idle);
+		caster.graphics.use(blueWitchAnims.idle);
 		iceBlastProj.actions.moveTo(target.pos.add(vec(-20, 0)), 800);
 	});
 	game.add(iceBlastProj);
@@ -177,7 +177,7 @@ function iceBlast(game: Engine, caster: Unit, target: Unit): Promise<void> {
 }
 
 function iceNova(game: Engine, caster: Unit, target: Unit): Promise<void> {
-	caster.graphics.use(witchAnims.charge);
+	caster.graphics.use(blueWitchAnims.charge);
 	const iceNovaVortex = new Actor({
 		pos: target.pos,
 	});
@@ -186,7 +186,7 @@ function iceNova(game: Engine, caster: Unit, target: Unit): Promise<void> {
 	iceNovaAnims.startup.events.once('end', () => {
 		iceNovaAnims.nova.reset();
 		iceNovaVortex.graphics.use(iceNovaAnims.nova);
-		caster.graphics.use(witchAnims.idle);
+		caster.graphics.use(blueWitchAnims.idle);
 	});
 	iceNovaAnims.nova.events.once('end', () => {
 		iceNovaAnims.end.reset();

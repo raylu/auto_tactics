@@ -4,7 +4,7 @@ import {score} from '../shared/score';
 import {loader} from './loader';
 import {sndPlugin} from './sounds';
 import {SLOT_DEFAULT_COLOR, initSpells, spellSlots, spells} from './spells';
-import {enemyAnims, terrainGrass, witchAnims} from './sprites';
+import {blueWitchAnims, enemyAnims, redWitchAnims, terrainGrass} from './sprites';
 import {gameState} from './state';
 import {Unit} from './unit';
 
@@ -36,12 +36,20 @@ const blueWitch = new Unit({
 	scale: vec(1.5, 1.5),
 	height: 40,
 	width: 24,
-}, {maxHP: 40, idleAnimation: witchAnims.idle, deathAnimation: witchAnims.death});
-blueWitch.graphics.use(witchAnims.idle);
+}, {maxHP: 40, idleAnimation: blueWitchAnims.idle, deathAnimation: blueWitchAnims.death});
 game.add(blueWitch);
-witchAnims.takeDamage.events.on('end', () => {
-	blueWitch.graphics.use(witchAnims.idle);
+blueWitchAnims.takeDamage.events.on('end', () => {
+	blueWitch.graphics.use(blueWitchAnims.idle);
 });
+
+const redWitch = new Unit({
+	pos: vec(100, 300),
+	offset: vec(0, 4),
+	scale: vec(1.5, 1.5),
+	height: 48,
+	width: 24,
+}, {maxHP: 40, idleAnimation: redWitchAnims.idle, deathAnimation: redWitchAnims.death});
+game.add(redWitch);
 
 const ENEMY_START = vec(500, 200);
 const enemy = new Unit({
@@ -51,7 +59,6 @@ const enemy = new Unit({
 	width: 22,
 	height: 36,
 }, {maxHP: 100, idleAnimation: enemyAnims.idle, deathAnimation: enemyAnims.death});
-enemy.graphics.use(enemyAnims.idle);
 enemy.graphics.flipHorizontal = true;
 game.add(enemy);
 function enemyAttack(): Promise<void> {
@@ -63,8 +70,8 @@ function enemyAttack(): Promise<void> {
 		.delay(200)
 		.callMethod(() => {
 			sndPlugin.playSound('kinetic');
-			witchAnims.takeDamage.reset();
-			blueWitch.graphics.use(witchAnims.takeDamage);
+			blueWitchAnims.takeDamage.reset();
+			blueWitch.graphics.use(blueWitchAnims.takeDamage);
 		})
 		.delay(500)
 		.moveTo(ENEMY_START, 2000)
@@ -128,7 +135,7 @@ start.addEventListener('click', async () => {
 				}
 			}
 		} else {
-			blueWitch.graphics.use(witchAnims.idle);
+			blueWitch.graphics.use(blueWitchAnims.idle);
 			if (!enemy.resolveFreeze())
 				await enemyAttack();
 		}

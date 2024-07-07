@@ -35,6 +35,7 @@ export class Unit extends Actor {
 
 		this.idleAnimation = unitConfig.idleAnimation;
 		this.deathAnimation = unitConfig.deathAnimation;
+		this.graphics.use(unitConfig.idleAnimation);
 	}
 
 	onPostUpdate(engine: Engine<any>, delta: number): void {
