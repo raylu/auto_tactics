@@ -2,7 +2,7 @@ import {Actor, BaseAlign, Color, type Engine, Font, type Graphic, Label, type Po
 	type Vector, range, vec} from 'excalibur';
 
 import {iceSound, sndPlugin} from './sounds';
-import {blueWitchAnims, blueWitchIconImg, iceBlastAnims, iceNovaAnims, redWitchIconImg, spellIcons} from './sprites';
+import {blueWitchIconImg, iceBlastAnims, iceNovaAnims, redWitchIconImg, spellIcons} from './sprites';
 import {gameState} from './state';
 import type {Unit} from './unit';
 
@@ -114,7 +114,7 @@ class Spell {
 		let damage = this.stats.damage;
 		if (target.freeze > 100)
 			damage *= this.stats.targetFrozenDamageMultiplier;
-		target.setHealth(Math.max(target.health - damage, 0));
+		target.setHealth(target.health - damage);
 		if (target.health === 0)
 			await target.die();
 	}
@@ -153,7 +153,7 @@ class Spell {
 }
 
 function iceBlast(game: Engine, caster: Unit, target: Unit): Promise<void> {
-	caster.graphics.use(blueWitchAnims.charge);
+	caster.graphics.use(caster.animations.charge);
 	const iceBlastProj = new Actor({
 		pos: caster.pos,
 		width: iceBlastAnims.projectile.width,
@@ -163,7 +163,7 @@ function iceBlast(game: Engine, caster: Unit, target: Unit): Promise<void> {
 	iceBlastProj.graphics.use(iceBlastAnims.startup);
 	iceBlastAnims.startup.events.once('end', () => {
 		iceBlastProj.graphics.use(iceBlastAnims.projectile);
-		caster.graphics.use(blueWitchAnims.idle);
+		caster.graphics.use(caster.animations.idle);
 		iceBlastProj.actions.moveTo(target.pos.add(vec(-20, 0)), 800);
 	});
 	game.add(iceBlastProj);
@@ -183,7 +183,7 @@ function iceBlast(game: Engine, caster: Unit, target: Unit): Promise<void> {
 }
 
 function iceNova(game: Engine, caster: Unit, target: Unit): Promise<void> {
-	caster.graphics.use(blueWitchAnims.charge);
+	caster.graphics.use(caster.animations.charge);
 	const iceNovaVortex = new Actor({
 		pos: target.pos,
 	});
@@ -192,7 +192,7 @@ function iceNova(game: Engine, caster: Unit, target: Unit): Promise<void> {
 	iceNovaAnims.startup.events.once('end', () => {
 		iceNovaAnims.nova.reset();
 		iceNovaVortex.graphics.use(iceNovaAnims.nova);
-		caster.graphics.use(blueWitchAnims.idle);
+		caster.graphics.use(caster.animations.idle);
 	});
 	iceNovaAnims.nova.events.once('end', () => {
 		iceNovaAnims.end.reset();

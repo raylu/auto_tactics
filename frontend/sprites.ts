@@ -1,5 +1,13 @@
 import {Animation, AnimationStrategy, ImageSource, type Loadable, SpriteSheet, range} from 'excalibur';
+
 import {loader} from './loader';
+
+export interface UnitAnimations {
+	readonly idle: Animation,
+	readonly charge: Animation,
+	readonly takeDamage: Animation,
+	readonly death: Animation,
+}
 
 const resources: Loadable<any>[] = [];
 
@@ -16,15 +24,17 @@ function witchAnimation(name: string, rows: number, width: number, height: numbe
 		},
 	}), range(0, rows - 1), 100, strategy);
 }
-export const blueWitchAnims = {
+export const blueWitchAnims: UnitAnimations = {
 	idle: witchAnimation('blue_witch/idle', 6, 32, 48),
 	charge: witchAnimation('blue_witch/charge', 5, 48, 48),
 	takeDamage: witchAnimation('blue_witch/take_damage', 3, 32, 48, AnimationStrategy.Freeze),
 	death: witchAnimation('blue_witch/death', 12, 32, 48, AnimationStrategy.Freeze),
 } as const;
 export const blueWitchIconImg = new ImageSource('static/sprites/blue_witch/icon.gif');
-export const redWitchAnims = {
+export const redWitchAnims: UnitAnimations = {
 	idle: witchAnimation('red_witch/idle', 6, 32, 64),
+	charge: witchAnimation('red_witch/charge', 10, 155, 65),
+	takeDamage: witchAnimation('red_witch/take_damage', 3, 32, 64, AnimationStrategy.Freeze),
 	death: witchAnimation('red_witch/death', 14, 45, 64, AnimationStrategy.Freeze),
 } as const;
 export const redWitchIconImg = new ImageSource('static/sprites/red_witch/icon.gif');

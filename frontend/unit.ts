@@ -1,11 +1,11 @@
 import {Actor, type ActorArgs, type Animation, Color, Debug, Engine, type ExcaliburGraphicsContext, type Rectangle,
 	Vector, vec} from 'excalibur';
 import {SLOT_DEFAULT_COLOR, type SpellSlot} from './spells';
+import type {UnitAnimations} from './sprites';
 
 interface UnitConfig {
 	maxHP: number;
-	idleAnimation: Animation;
-	deathAnimation: Animation;
+	animations: UnitAnimations,
 	spellSlots: SpellSlot[];
 }
 
@@ -15,8 +15,7 @@ export class Unit extends Actor {
 	healthBar: Actor;
 	barMaxWidth: number;
 	freeze = 0;
-	idleAnimation: Animation;
-	deathAnimation: Animation;
+	animations: UnitAnimations;
 	spellSlots: SpellSlot[];
 
 	constructor(config: ActorArgs & {width: number, height: number}, unitConfig: UnitConfig) {
@@ -36,9 +35,8 @@ export class Unit extends Actor {
 		};
 		this.addChild(this.healthBar);
 
-		this.idleAnimation = unitConfig.idleAnimation;
-		this.deathAnimation = unitConfig.deathAnimation;
-		this.graphics.use(unitConfig.idleAnimation);
+		this.animations = unitConfig.animations;
+		this.graphics.use(unitConfig.animations.idle);
 
 		this.spellSlots = unitConfig.spellSlots;
 	}
@@ -62,7 +60,7 @@ export class Unit extends Actor {
 	}
 
 	setHealth(health: number) {
-		this.health = health;
+		this.health = Math.max(health, 0);
 		(this.healthBar.graphics.current as Rectangle).width = this.health / this.maxHP * this.barMaxWidth;
 	}
 
@@ -107,15 +105,15 @@ export class Unit extends Actor {
 		this.setHealth(this.maxHP);
 		this.freeze = 0;
 		this.unfreeze();
-		this.graphics.use(this.idleAnimation);
+		this.graphics.use(this.animations.idle);
 	}
 
 	die(): Promise<void> {
 		this.unfreeze();
-		this.deathAnimation.reset();
-		this.graphics.use(this.deathAnimation);
+		this.animations.death.reset();
+		this.graphics.use(this.animations.death);
 		const {promise, resolve} = Promise.withResolvers<void>();
-		this.deathAnimation.events.once('end', () => {
+		this.animations.death.events.once('end', () => {
 			resolve();
 		});
 		return promise;

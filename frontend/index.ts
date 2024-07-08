@@ -36,11 +36,12 @@ const blueWitch = new Unit({
 	scale: vec(1.5, 1.5),
 	height: 40,
 	width: 24,
-}, {maxHP: 40, idleAnimation: blueWitchAnims.idle, deathAnimation: blueWitchAnims.death, spellSlots: spellSlots.blueWitch});
-game.add(blueWitch);
-blueWitchAnims.takeDamage.events.on('end', () => {
-	blueWitch.graphics.use(blueWitchAnims.idle);
+}, {
+	maxHP: 40,
+	animations: blueWitchAnims,
+	spellSlots: spellSlots.blueWitch,
 });
+game.add(blueWitch);
 
 const redWitch = new Unit({
 	pos: vec(100, 300),
@@ -48,8 +49,18 @@ const redWitch = new Unit({
 	scale: vec(1.5, 1.5),
 	height: 48,
 	width: 24,
-}, {maxHP: 40, idleAnimation: redWitchAnims.idle, deathAnimation: redWitchAnims.death, spellSlots: spellSlots.redWitch});
+}, {
+	maxHP: 40,
+	animations: redWitchAnims,
+	spellSlots: spellSlots.redWitch,
+});
 game.add(redWitch);
+
+const playerUnits = [blueWitch, redWitch];
+for (const witch of playerUnits)
+	witch.animations.takeDamage.events.on('end', () => {
+		witch.graphics.use(witch.animations.idle);
+	});
 
 const ENEMY_START = vec(500, 200);
 const enemy = new Unit({
@@ -58,28 +69,32 @@ const enemy = new Unit({
 	scale: vec(2, 2),
 	width: 22,
 	height: 36,
-}, {maxHP: 100, idleAnimation: enemyAnims.idle, deathAnimation: enemyAnims.death, spellSlots: []});
+}, {
+	maxHP: 100,
+	animations: {...enemyAnims, charge: enemyAnims.idle, takeDamage: enemyAnims.idle},
+	spellSlots: [],
+});
 enemy.graphics.flipHorizontal = true;
 game.add(enemy);
-function enemyAttack(): Promise<void> {
+function enemyAttack(target: Unit): Promise<void> {
 	enemyAnims.attack.reset();
 	enemy.graphics.use(enemyAnims.attack);
 	const {promise, resolve} = Promise.withResolvers<void>();
 	enemy.actions
-		.moveTo(vec(blueWitch.pos.x + 60, blueWitch.pos.y), 1000)
+		.moveTo(vec(target.pos.x + 60, target.pos.y), 1000)
 		.delay(200)
 		.callMethod(() => {
 			sndPlugin.playSound('kinetic');
-			blueWitchAnims.takeDamage.reset();
-			blueWitch.graphics.use(blueWitchAnims.takeDamage);
+			target.animations.takeDamage.reset();
+			target.graphics.use(target.animations.takeDamage);
 		})
 		.delay(500)
 		.moveTo(ENEMY_START, 2000)
 		.callMethod(() => {
 			enemy.graphics.use(enemyAnims.idle);
-			blueWitch.setHealth(blueWitch.health - 10);
-			if (blueWitch.health === 0)
-				void blueWitch.die().then(resolve);
+			target.setHealth(target.health - 10);
+			if (target.health === 0)
+				void target.die().then(resolve);
 			else
 				resolve();
 		});
@@ -118,17 +133,18 @@ start.addEventListener('click', async () => {
 		return;
 	start.disabled = gameState.simulating = true;
 
-	const playerUnits = [blueWitch, redWitch];
 	let playerTurn = true;
 	while ((blueWitch.health + redWitch.health) > 0 && enemy.health > 0) {
 		if (playerTurn)
 			for (const witch of playerUnits)
 				await witch.resolveTurn(game, enemy);
 		else {
-			for (const witch of playerUnits)
-				witch.graphics.use(witch.idleAnimation);
 			if (!enemy.resolveFreeze())
-				await enemyAttack();
+				for (const witch of playerUnits)
+					if (witch.health > 0) {
+						await enemyAttack(witch);
+						break;
+					}
 		}
 		playerTurn = !playerTurn;
 	}
@@ -148,7 +164,8 @@ start.addEventListener('click', async () => {
 });
 
 restart.addEventListener('click', () => {
-	blueWitch.reset();
+	for (const witch of playerUnits)
+		witch.reset();
 	enemy.reset();
 
 	for (const spell of spells)
