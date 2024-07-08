@@ -3,7 +3,7 @@ import {Color, DisplayMode, Engine, Font, Label, Random, TextAlign, TileMap, vec
 import {score} from '../shared/score';
 import {loader} from './loader';
 import {sndPlugin} from './sounds';
-import {SLOT_DEFAULT_COLOR, initSpells, spellSlots, spells} from './spells';
+import {initSpells, spellSlots, spells} from './spells';
 import {blueWitchAnims, enemyAnims, redWitchAnims, terrainGrass} from './sprites';
 import {gameState} from './state';
 import {Unit} from './unit';
@@ -36,7 +36,7 @@ const blueWitch = new Unit({
 	scale: vec(1.5, 1.5),
 	height: 40,
 	width: 24,
-}, {maxHP: 40, idleAnimation: blueWitchAnims.idle, deathAnimation: blueWitchAnims.death});
+}, {maxHP: 40, idleAnimation: blueWitchAnims.idle, deathAnimation: blueWitchAnims.death, spellSlots: spellSlots.blueWitch});
 game.add(blueWitch);
 blueWitchAnims.takeDamage.events.on('end', () => {
 	blueWitch.graphics.use(blueWitchAnims.idle);
@@ -48,7 +48,7 @@ const redWitch = new Unit({
 	scale: vec(1.5, 1.5),
 	height: 48,
 	width: 24,
-}, {maxHP: 40, idleAnimation: redWitchAnims.idle, deathAnimation: redWitchAnims.death});
+}, {maxHP: 40, idleAnimation: redWitchAnims.idle, deathAnimation: redWitchAnims.death, spellSlots: spellSlots.redWitch});
 game.add(redWitch);
 
 const ENEMY_START = vec(500, 200);
@@ -58,7 +58,7 @@ const enemy = new Unit({
 	scale: vec(2, 2),
 	width: 22,
 	height: 36,
-}, {maxHP: 100, idleAnimation: enemyAnims.idle, deathAnimation: enemyAnims.death});
+}, {maxHP: 100, idleAnimation: enemyAnims.idle, deathAnimation: enemyAnims.death, spellSlots: []});
 enemy.graphics.flipHorizontal = true;
 game.add(enemy);
 function enemyAttack(): Promise<void> {
@@ -111,31 +111,22 @@ const restart = document.querySelector('button#restart') as HTMLButtonElement;
 game.on('initialize', () => {
 	start.style.display = 'block';
 });
+
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 start.addEventListener('click', async () => {
 	if (gameState.simulating)
 		return;
 	start.disabled = gameState.simulating = true;
 
+	const playerUnits = [blueWitch, redWitch];
 	let playerTurn = true;
-	while (blueWitch.health > 0 && enemy.health > 0) {
-		if (playerTurn) {
-			if (!blueWitch.resolveFreeze()) {
-				let casted = false;
-				for (const {spell, slot} of spellSlots.blueWitch) {
-					if (spell === null)
-						continue;
-					if (!casted && (spell.cooldown?.remaining ?? 0) == 0) {
-						slot.color = Color.Viridian;
-						await spell.cast(game, blueWitch, enemy);
-						slot.color = SLOT_DEFAULT_COLOR;
-						casted = true;
-					} else
-						spell.decrementCooldown();
-				}
-			}
-		} else {
-			blueWitch.graphics.use(blueWitchAnims.idle);
+	while ((blueWitch.health + redWitch.health) > 0 && enemy.health > 0) {
+		if (playerTurn)
+			for (const witch of playerUnits)
+				await witch.resolveTurn(game, enemy);
+		else {
+			for (const witch of playerUnits)
+				witch.graphics.use(witch.idleAnimation);
 			if (!enemy.resolveFreeze())
 				await enemyAttack();
 		}
@@ -155,6 +146,7 @@ start.addEventListener('click', async () => {
 	}
 	restart.style.display = 'block';
 });
+
 restart.addEventListener('click', () => {
 	blueWitch.reset();
 	enemy.reset();

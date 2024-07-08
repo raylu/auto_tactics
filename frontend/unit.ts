@@ -1,10 +1,12 @@
 import {Actor, type ActorArgs, type Animation, Color, Debug, Engine, type ExcaliburGraphicsContext, type Rectangle,
 	Vector, vec} from 'excalibur';
+import {SLOT_DEFAULT_COLOR, type SpellSlot} from './spells';
 
 interface UnitConfig {
 	maxHP: number;
 	idleAnimation: Animation;
 	deathAnimation: Animation;
+	spellSlots: SpellSlot[];
 }
 
 export class Unit extends Actor {
@@ -15,6 +17,7 @@ export class Unit extends Actor {
 	freeze = 0;
 	idleAnimation: Animation;
 	deathAnimation: Animation;
+	spellSlots: SpellSlot[];
 
 	constructor(config: ActorArgs & {width: number, height: number}, unitConfig: UnitConfig) {
 		super(config);
@@ -36,6 +39,8 @@ export class Unit extends Actor {
 		this.idleAnimation = unitConfig.idleAnimation;
 		this.deathAnimation = unitConfig.deathAnimation;
 		this.graphics.use(unitConfig.idleAnimation);
+
+		this.spellSlots = unitConfig.spellSlots;
 	}
 
 	onPostUpdate(engine: Engine<any>, delta: number): void {
@@ -59,6 +64,23 @@ export class Unit extends Actor {
 	setHealth(health: number) {
 		this.health = health;
 		(this.healthBar.graphics.current as Rectangle).width = this.health / this.maxHP * this.barMaxWidth;
+	}
+
+	async resolveTurn(game: Engine, target: Unit) {
+		if (this.health === 0 || this.resolveFreeze())
+			return;
+		let casted = false;
+		for (const {spell, slot} of this.spellSlots) {
+			if (spell === null)
+				continue;
+			if (!casted && (spell.cooldown?.remaining ?? 0) == 0) {
+				slot.color = Color.Viridian;
+				await spell.cast(game, this, target);
+				slot.color = SLOT_DEFAULT_COLOR;
+				casted = true;
+			} else
+				spell.decrementCooldown();
+		}
 	}
 
 	resolveFreeze(): boolean {

@@ -20,7 +20,7 @@ interface SpellStats {
 }
 type CastFn = (game: Engine, caster: Unit, target: Unit) => Promise<void>;
 
-interface SpellSlot {
+export interface SpellSlot {
 	readonly slot: ScreenElement;
 	spell: Spell | null;
 }
@@ -230,7 +230,7 @@ export const spellSlots = {
 	bar: [] as SpellSlot[],
 	blueWitch: [] as SpellSlot[],
 	redWitch: [] as SpellSlot[],
-};
+} as const;
 
 export const SLOT_DEFAULT_COLOR = Color.fromRGB(92, 97, 128);
 
@@ -243,7 +243,7 @@ export function initSpells(game: Engine) {
 		pos: spellBarPos,
 		anchor: vec(0, 0.5),
 	}));
-	spellSlots.bar = range(0, 3).map((i) => {
+	spellSlots.bar.push(...range(0, 3).map((i) => {
 		const slot = new ScreenElement({
 			color: Color.fromRGB(100, 100, 100),
 			height: 34,
@@ -253,15 +253,15 @@ export function initSpells(game: Engine) {
 		});
 		game.add(slot);
 		return {slot, spell: null};
-	});
+	}));
 	spells.forEach((spell, i) => {
 		spellSlots.bar[i].spell = spell;
 		spell.placeIcon(spellSlots.bar[i]);
 		game.add(spell.icon);
 	});
 
-	spellSlots.blueWitch = witchSpellSlots(game, blueWitchIconImg.toSprite(), vec(40, game.drawHeight - 140));
-	spellSlots.redWitch = witchSpellSlots(game, redWitchIconImg.toSprite(), vec(40, game.drawHeight - 70));
+	spellSlots.blueWitch.push(...witchSpellSlots(game, blueWitchIconImg.toSprite(), vec(40, game.drawHeight - 140)));
+	spellSlots.redWitch.push(...witchSpellSlots(game, redWitchIconImg.toSprite(), vec(40, game.drawHeight - 70)));
 
 	let draggedSpell: Spell | null = null;
 	game.input.pointers.primary.on('down', (event: PointerEvent) => {
