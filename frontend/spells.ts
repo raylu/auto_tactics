@@ -1,8 +1,8 @@
-import {Actor, BaseAlign, Color, type Engine, Font, Label, type PointerEvent, ScreenElement, TextAlign, type Vector,
-	range, vec} from 'excalibur';
+import {Actor, BaseAlign, Color, type Engine, Font, type Graphic, Label, type PointerEvent, ScreenElement, TextAlign,
+	type Vector, range, vec} from 'excalibur';
 
 import {iceSound, sndPlugin} from './sounds';
-import {blueWitchAnims, blueWitchIconImg, iceBlastAnims, iceNovaAnims, spellIcons} from './sprites';
+import {blueWitchAnims, blueWitchIconImg, iceBlastAnims, iceNovaAnims, redWitchIconImg, spellIcons} from './sprites';
 import {gameState} from './state';
 import type {Unit} from './unit';
 
@@ -85,7 +85,13 @@ class Spell {
 		this.icon.on('pointermove', (event: PointerEvent) => {
 			const height = tooltip.getBoundingClientRect().height;
 			tooltip.style.top = (event.screenPos.y - height - 4) + 'px';
-			tooltip.style.left = event.screenPos.x + 'px';
+			if (this.icon.pos.x < 320) {
+				tooltip.style.left = event.screenPos.x + 'px';
+				tooltip.style.right = '';
+			} else {
+				tooltip.style.right = (640 - event.screenPos.x) + 'px';
+				tooltip.style.left = '';
+			}
 		});
 		this.iconPos = vec(0, 0);
 
@@ -223,16 +229,18 @@ export const spells = [
 export const spellSlots = {
 	bar: [] as SpellSlot[],
 	blueWitch: [] as SpellSlot[],
+	redWitch: [] as SpellSlot[],
 };
 
 export const SLOT_DEFAULT_COLOR = Color.fromRGB(92, 97, 128);
 
 export function initSpells(game: Engine) {
+	const spellBarPos = vec(275, game.drawHeight - 150);
 	game.add(new ScreenElement({ // spell bar background
 		color: Color.fromRGB(0, 0, 0),
 		height: 40,
 		width: 162,
-		pos: vec(50, game.drawHeight - 150),
+		pos: spellBarPos,
 		anchor: vec(0, 0.5),
 	}));
 	spellSlots.bar = range(0, 3).map((i) => {
@@ -240,7 +248,7 @@ export function initSpells(game: Engine) {
 			color: Color.fromRGB(100, 100, 100),
 			height: 34,
 			width: 34,
-			pos: vec(70 + i * 40, game.drawHeight - 150),
+			pos: spellBarPos.add(vec(20 + i * 40, 0)),
 			anchor: vec(0.5, 0.5),
 		});
 		game.add(slot);
@@ -252,30 +260,8 @@ export function initSpells(game: Engine) {
 		game.add(spell.icon);
 	});
 
-	const blueWitchIcon = new ScreenElement({
-		pos: vec(40, game.drawHeight - 70),
-		anchor: vec(0.5, 0.5),
-	});
-	blueWitchIcon.graphics.use(blueWitchIconImg.toSprite());
-	game.add(blueWitchIcon);
-	game.add(new ScreenElement({ // spell slots background
-		color: Color.fromRGB(0, 10, 20),
-		height: 60,
-		width: 160,
-		pos: vec(75, game.drawHeight - 70),
-		anchor: vec(0, 0.5),
-	}));
-	spellSlots.blueWitch = range(0, 2).map((i) => {
-		const slot = new ScreenElement({
-			color: SLOT_DEFAULT_COLOR,
-			height: 40,
-			width: 40,
-			pos: vec(105 + i * 50, game.drawHeight - 70),
-			anchor: vec(0.5, 0.5),
-		});
-		game.add(slot);
-		return {slot, spell: null};
-	});
+	spellSlots.blueWitch = witchSpellSlots(game, blueWitchIconImg.toSprite(), vec(40, game.drawHeight - 140));
+	spellSlots.redWitch = witchSpellSlots(game, redWitchIconImg.toSprite(), vec(40, game.drawHeight - 70));
 
 	let draggedSpell: Spell | null = null;
 	game.input.pointers.primary.on('down', (event: PointerEvent) => {
@@ -304,5 +290,32 @@ export function initSpells(game: Engine) {
 		}
 		draggedSpell.icon.actions.moveTo(draggedSpell.iconPos, 1000);
 		draggedSpell = null;
+	});
+}
+
+function witchSpellSlots(game: Engine, icon: Graphic, witchIconPos: Vector): SpellSlot[] {
+	const witchIcon = new ScreenElement({
+		pos: witchIconPos,
+		anchor: vec(0.5, 0.5),
+	});
+	witchIcon.graphics.use(icon);
+	game.add(witchIcon);
+	game.add(new ScreenElement({ // spell slots background
+		color: Color.fromRGB(0, 10, 20),
+		height: 60,
+		width: 160,
+		pos: witchIconPos.add(vec(35, 0)),
+		anchor: vec(0, 0.5),
+	}));
+	return range(0, 2).map((i) => {
+		const slot = new ScreenElement({
+			color: SLOT_DEFAULT_COLOR,
+			height: 40,
+			width: 40,
+			pos: witchIconPos.add(vec(65 + i * 50, 0)),
+			anchor: vec(0.5, 0.5),
+		});
+		game.add(slot);
+		return {slot, spell: null};
 	});
 }

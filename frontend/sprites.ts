@@ -27,6 +27,7 @@ export const redWitchAnims = {
 	idle: witchAnimation('red_witch/idle', 6, 32, 64),
 	death: witchAnimation('red_witch/death', 14, 45, 64, AnimationStrategy.Freeze),
 } as const;
+export const redWitchIconImg = new ImageSource('static/sprites/red_witch/icon.gif');
 
 const enemyImg = new ImageSource('static/sprites/enemy.png');
 const enemySprites = SpriteSheet.fromImageSource({
@@ -118,5 +119,5 @@ export const iceNovaAnims = {
 	end: Animation.fromSpriteSheet(iceNovaEnd, range(0, 7), 50, AnimationStrategy.Freeze),
 } as const;
 
-loader.addResources([...resources, blueWitchIconImg, enemyImg, terrainGrassImg, spellIconsImg, iceBlastProjectileImg,
-	iceBlastImpactImg, iceNovaVortexImg, iceNovaEndImg]);
+loader.addResources([...resources, blueWitchIconImg, redWitchIconImg, enemyImg, terrainGrassImg, spellIconsImg,
+	iceBlastProjectileImg, iceBlastImpactImg, iceNovaVortexImg, iceNovaEndImg]);
