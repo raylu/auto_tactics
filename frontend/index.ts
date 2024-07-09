@@ -45,7 +45,7 @@ game.add(blueWitch);
 
 const redWitch = new Unit({
 	pos: vec(100, 300),
-	offset: vec(0, 4),
+	offset: vec(0, 2),
 	scale: vec(1.5, 1.5),
 	height: 48,
 	width: 24,

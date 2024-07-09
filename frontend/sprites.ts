@@ -33,9 +33,9 @@ export const blueWitchAnims: UnitAnimations = {
 export const blueWitchIconImg = new ImageSource('static/sprites/blue_witch/icon.gif');
 export const redWitchAnims: UnitAnimations = {
 	idle: witchAnimation('red_witch/idle', 6, 32, 64),
-	charge: witchAnimation('red_witch/charge', 10, 155, 65),
+	charge: witchAnimation('red_witch/charge', 10, 40, 65),
 	takeDamage: witchAnimation('red_witch/take_damage', 3, 32, 64, AnimationStrategy.Freeze),
-	death: witchAnimation('red_witch/death', 14, 45, 64, AnimationStrategy.Freeze),
+	death: witchAnimation('red_witch/death', 14, 56, 64, AnimationStrategy.Freeze),
 } as const;
 export const redWitchIconImg = new ImageSource('static/sprites/red_witch/icon.gif');
 
