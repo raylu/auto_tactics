@@ -136,8 +136,11 @@ start.addEventListener('click', async () => {
 	let playerTurn = true;
 	while ((blueWitch.health + redWitch.health) > 0 && enemy.health > 0) {
 		if (playerTurn)
-			for (const witch of playerUnits)
+			for (const witch of playerUnits) {
 				await witch.resolveTurn(game, enemy);
+				if (enemy.health === 0)
+					break;
+			}
 		else {
 			if (!enemy.resolveFreeze())
 				for (const witch of playerUnits)
