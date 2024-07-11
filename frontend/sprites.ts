@@ -129,5 +129,20 @@ export const iceNovaAnims = {
 	end: Animation.fromSpriteSheet(iceNovaEnd, range(0, 7), 50, AnimationStrategy.Freeze),
 } as const;
 
+const fireballImg = new ImageSource('static/sprites/fireball.png');
+const fireball = SpriteSheet.fromImageSource({
+	image: fireballImg,
+	grid: {
+		rows: 1,
+		columns: 11,
+		spriteHeight: 48,
+		spriteWidth: 48,
+	},
+});
+export const fireballAnims = {
+	projectile: Animation.fromSpriteSheet(fireball, range(0, 3), 100),
+	impact: Animation.fromSpriteSheet(fireball, range(5, 10), 150, AnimationStrategy.Freeze),
+} as const;
+
 loader.addResources([...resources, blueWitchIconImg, redWitchIconImg, enemyImg, terrainGrassImg, spellIconsImg,
-	iceBlastProjectileImg, iceBlastImpactImg, iceNovaVortexImg, iceNovaEndImg]);
+	iceBlastProjectileImg, iceBlastImpactImg, iceNovaVortexImg, iceNovaEndImg, fireballImg]);

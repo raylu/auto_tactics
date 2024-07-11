@@ -2,7 +2,7 @@ import {Actor, BaseAlign, Color, type Engine, Font, type Graphic, Label, type Po
 	type Vector, range, vec} from 'excalibur';
 
 import {iceSound, sndPlugin} from './sounds';
-import {blueWitchIconImg, iceBlastAnims, iceNovaAnims, redWitchIconImg, spellIcons} from './sprites';
+import {blueWitchIconImg, fireballAnims, iceBlastAnims, iceNovaAnims, redWitchIconImg, spellIcons} from './sprites';
 import {gameState} from './state';
 import type {Unit} from './unit';
 
@@ -210,6 +210,30 @@ function iceNova(game: Engine, caster: Unit, target: Unit): Promise<void> {
 	return promise;
 }
 
+function fireball(game: Engine, caster: Unit, target: Unit): Promise<void> {
+	caster.graphics.use(caster.animations.charge);
+	const fireballProj = new Actor({
+		pos: caster.pos,
+		width: fireballAnims.projectile.width,
+		height: fireballAnims.projectile.height,
+	});
+	fireballProj.graphics.use(fireballAnims.projectile);
+	game.add(fireballProj);
+	fireballProj.actions.moveTo(target.pos.add(vec(-20, 0)), 600);
+	const {promise, resolve} = Promise.withResolvers<void>();
+	fireballProj.events.on('actioncomplete', () => {
+		caster.graphics.use(caster.animations.idle);
+		fireballAnims.impact.reset();
+		fireballProj.graphics.use(fireballAnims.impact);
+		sndPlugin.playSound('spell');
+	});
+	fireballAnims.impact.events.once('end', () => {
+		fireballProj.kill();
+		resolve();
+	});
+	return promise;
+}
+
 export const spells = [
 	new Spell({name: 'ice blast',
 		baseCooldown: null,
@@ -223,6 +247,13 @@ export const spells = [
 		stats: {damage: 10, targetFrozenDamageMultiplier: 5},
 		icon: {x: 4, y: 1},
 		castFn: iceNova,
+	}),
+	new Spell({
+		name: 'fireball',
+		baseCooldown: null,
+		stats: {damage: 20},
+		icon: {x: 2, y: 0},
+		castFn: fireball,
 	}),
 ];
 
