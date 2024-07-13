@@ -1,7 +1,7 @@
 import {Actor, BaseAlign, Color, type Engine, Font, type Graphic, Label, type PointerEvent, ScreenElement, TextAlign,
 	type Vector, range, vec} from 'excalibur';
 
-import {iceSound, sndPlugin} from './sounds';
+import {fireExplosion, fireHold, fireSound, iceSound, sndPlugin} from './sounds';
 import {armageddonAnims, blueWitchIconImg, fireballAnims, iceBlastAnims, iceNovaAnims, redWitchIconImg, spellIcons} from './sprites';
 import {gameState} from './state';
 import type {Unit} from './unit';
@@ -220,6 +220,7 @@ function fireball(game: Engine, caster: Unit, target: Unit): Promise<void> {
 	fireballProj.graphics.use(fireballAnims.projectile);
 	game.add(fireballProj);
 	fireballProj.actions.moveTo(target.pos.add(vec(-20, 0)), 600);
+	void fireSound.play(0.5);
 	const {promise, resolve} = Promise.withResolvers<void>();
 	fireballProj.events.on('actioncomplete', () => {
 		caster.graphics.use(caster.animations.idle);
@@ -244,11 +245,14 @@ function armageddon(game: Engine, caster: Unit, target: Unit): Promise<void> {
 	armageddonAnims.beam.reset();
 	explosion.graphics.use(armageddonAnims.beam);
 	game.add(explosion);
+	void fireHold.play();
 	const {promise, resolve} = Promise.withResolvers<void>();
 	armageddonAnims.beam.events.once('end', () => {
 		caster.graphics.use(caster.animations.idle);
+		fireHold.stop();
 		armageddonAnims.explosion.reset();
 		explosion.graphics.use(armageddonAnims.explosion);
+		void fireExplosion.play();
 	});
 	armageddonAnims.explosion.events.once('end', () => {
 		explosion.kill();

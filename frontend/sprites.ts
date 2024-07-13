@@ -154,7 +154,7 @@ export const armageddonAnims = {
 	explosion: Animation.fromSpriteSheet(SpriteSheet.fromImageSource({
 		image: armageddonExplosionImg,
 		grid: {rows: 1, columns: 18, spriteHeight: 48, spriteWidth: 48},
-	}), range(0, 17), 150, AnimationStrategy.Freeze),
+	}), range(0, 17), 100, AnimationStrategy.Freeze),
 };
 
 loader.addResources([...resources, blueWitchIconImg, redWitchIconImg, enemyImg, terrainGrassImg, spellIconsImg,

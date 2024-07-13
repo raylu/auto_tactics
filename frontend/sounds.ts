@@ -100,5 +100,8 @@ for (const sound in sounds)
 	sndPlugin.loadSoundConfig(sound, sounds[sound]);
 
 export const iceSound = new Sound('static/audio/ice.m4a');
+export const fireSound = new Sound('static/audio/fire.ogg');
+export const fireHold = new Sound('static/audio/fire_hold.ogg');
+export const fireExplosion = new Sound('static/audio/fire_explosion.ogg');
 
-loader.addResource(iceSound);
+loader.addResources([iceSound, fireSound, fireHold, fireExplosion]);
