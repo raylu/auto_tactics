@@ -144,5 +144,19 @@ export const fireballAnims = {
 	impact: Animation.fromSpriteSheet(fireball, range(5, 10), 150, AnimationStrategy.Freeze),
 } as const;
 
+const armageddonBeamImg = new ImageSource('static/sprites/armageddon/beam.png');
+const armageddonExplosionImg = new ImageSource('static/sprites/armageddon/explosion.png');
+export const armageddonAnims = {
+	beam: Animation.fromSpriteSheet(SpriteSheet.fromImageSource({
+		image: armageddonBeamImg,
+		grid: {rows: 1, columns: 16, spriteHeight: 48, spriteWidth: 48},
+	}), range(0, 15), 150, AnimationStrategy.Freeze),
+	explosion: Animation.fromSpriteSheet(SpriteSheet.fromImageSource({
+		image: armageddonExplosionImg,
+		grid: {rows: 1, columns: 18, spriteHeight: 48, spriteWidth: 48},
+	}), range(0, 17), 150, AnimationStrategy.Freeze),
+};
+
 loader.addResources([...resources, blueWitchIconImg, redWitchIconImg, enemyImg, terrainGrassImg, spellIconsImg,
-	iceBlastProjectileImg, iceBlastImpactImg, iceNovaVortexImg, iceNovaEndImg, fireballImg]);
+	iceBlastProjectileImg, iceBlastImpactImg, iceNovaVortexImg, iceNovaEndImg, fireballImg, armageddonBeamImg,
+	armageddonExplosionImg]);

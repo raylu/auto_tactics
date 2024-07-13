@@ -2,7 +2,7 @@ import {Actor, BaseAlign, Color, type Engine, Font, type Graphic, Label, type Po
 	type Vector, range, vec} from 'excalibur';
 
 import {iceSound, sndPlugin} from './sounds';
-import {blueWitchIconImg, fireballAnims, iceBlastAnims, iceNovaAnims, redWitchIconImg, spellIcons} from './sprites';
+import {armageddonAnims, blueWitchIconImg, fireballAnims, iceBlastAnims, iceNovaAnims, redWitchIconImg, spellIcons} from './sprites';
 import {gameState} from './state';
 import type {Unit} from './unit';
 
@@ -234,6 +234,29 @@ function fireball(game: Engine, caster: Unit, target: Unit): Promise<void> {
 	return promise;
 }
 
+function armageddon(game: Engine, caster: Unit, target: Unit): Promise<void> {
+	caster.graphics.use(caster.animations.charge);
+	const explosion = new Actor({
+		pos: vec(game.drawWidth / 2, 220),
+		anchor: vec(0.5, 0.5),
+		scale: vec(9, 9),
+	});
+	armageddonAnims.beam.reset();
+	explosion.graphics.use(armageddonAnims.beam);
+	game.add(explosion);
+	const {promise, resolve} = Promise.withResolvers<void>();
+	armageddonAnims.beam.events.once('end', () => {
+		caster.graphics.use(caster.animations.idle);
+		armageddonAnims.explosion.reset();
+		explosion.graphics.use(armageddonAnims.explosion);
+	});
+	armageddonAnims.explosion.events.once('end', () => {
+		explosion.kill();
+		resolve();
+	});
+	return promise;
+}
+
 export const spells = [
 	new Spell({name: 'ice blast',
 		baseCooldown: null,
@@ -254,6 +277,13 @@ export const spells = [
 		stats: {damage: 20},
 		icon: {x: 2, y: 0},
 		castFn: fireball,
+	}),
+	new Spell({
+		name: 'armageddon',
+		baseCooldown: 4,
+		stats: {},
+		icon: {x: 8, y: 1},
+		castFn: armageddon,
 	}),
 ];
 
