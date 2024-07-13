@@ -15,6 +15,7 @@ interface SpellOpts {
 }
 interface SpellStats {
 	damage: number;
+	damageAll: number;
 	targetFrozenDamageMultiplier: number;
 	freeze: number;
 }
@@ -47,6 +48,7 @@ class Spell {
 		base: number;
 		remaining: number;
 	} = null;
+	tooltipHTML: string;
 	private castFn: CastFn;
 
 	constructor(opts: SpellOpts) {
@@ -55,9 +57,21 @@ class Spell {
 			this.cooldown = {base: opts.baseCooldown, remaining: 0};
 		this.stats = {
 			damage: opts.stats.damage ?? 0,
+			damageAll: opts.stats.damageAll ?? 0,
 			targetFrozenDamageMultiplier: opts.stats.targetFrozenDamageMultiplier ?? 1,
 			freeze: opts.stats.freeze ?? 0,
 		};
+		this.tooltipHTML = `<b>${opts.name}</b>`;
+		if (this.cooldown !== null)
+			this.tooltipHTML += `<br>cooldown: ${this.cooldown.base}`;
+		if (this.stats.damage > 0)
+			this.tooltipHTML += `<br>damage: ${this.stats.damage}`;
+		if (this.stats.damageAll > 0)
+			this.tooltipHTML += `<br>deals ${this.stats.damageAll} damage to <strong>all</strong> units`;
+		if (this.stats.targetFrozenDamageMultiplier !== 1)
+			this.tooltipHTML += `<br>${this.stats.targetFrozenDamageMultiplier}× damage multiplier to frozen targets`;
+		if (this.stats.freeze > 0)
+			this.tooltipHTML += `<br>target gains +${this.stats.freeze}% freeze`;
 
 		const iconSprite = spellIcons.getSprite(opts.icon.x, opts.icon.y);
 		this.icon = new ScreenElement({
@@ -69,14 +83,7 @@ class Spell {
 		});
 		this.icon.graphics.use(iconSprite);
 		this.icon.on('pointerenter', () => {
-			tooltip.innerHTML = `<b>${opts.name}</b>`;
-			if (this.cooldown !== null)
-				tooltip.innerHTML += `<br>cooldown: ${this.cooldown.base}`;
-			tooltip.innerHTML += `<br>damage: ${this.stats.damage}`;
-			if (this.stats.targetFrozenDamageMultiplier !== 1)
-				tooltip.innerHTML += `<br>${this.stats.targetFrozenDamageMultiplier}× damage multiplier to frozen targets`;
-			if (this.stats.freeze > 0)
-				tooltip.innerHTML += `<br>target gains +${this.stats.freeze}% freeze`;
+			tooltip.innerHTML = this.tooltipHTML;
 			tooltip.style.opacity = '0.9';
 		});
 		this.icon.on('pointerleave', () => {
@@ -285,7 +292,7 @@ export const spells = [
 	new Spell({
 		name: 'armageddon',
 		baseCooldown: 4,
-		stats: {},
+		stats: {damageAll: 30},
 		icon: {x: 8, y: 1},
 		castFn: armageddon,
 	}),
