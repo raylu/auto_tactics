@@ -100,6 +100,7 @@ function enemyAttack(target: Unit): Promise<void> {
 		});
 	return promise;
 }
+const allUnits = [...playerUnits, enemy];
 
 const scoreDisplay = new Label({
 	visible: false,
@@ -137,7 +138,7 @@ start.addEventListener('click', async () => {
 	while ((blueWitch.health + redWitch.health) > 0 && enemy.health > 0) {
 		if (playerTurn)
 			for (const witch of playerUnits) {
-				await witch.resolveTurn(game, enemy);
+				await witch.resolveTurn(game, enemy, allUnits);
 				if (enemy.health === 0)
 					break;
 			}
@@ -167,9 +168,8 @@ start.addEventListener('click', async () => {
 });
 
 restart.addEventListener('click', () => {
-	for (const witch of playerUnits)
-		witch.reset();
-	enemy.reset();
+	for (const unit of allUnits)
+		unit.reset();
 
 	for (const spell of spells)
 		spell.resetCooldown();

@@ -114,16 +114,29 @@ class Spell {
 		this.icon.pos = spellSlot.slot.pos.clone();
 	}
 
-	async cast(game: Engine, caster: Unit, target: Unit) {
+	async cast(game: Engine, caster: Unit, target: Unit, allUnits: Unit[]) {
 		this.startCooldown();
 		await this.castFn(game, caster, target);
+
 		target.freeze += this.stats.freeze;
-		let damage = this.stats.damage;
+
+		const deaths = [];
+		let targetDamage = this.stats.damage + this.stats.damageAll;
 		if (target.freeze > 100)
-			damage *= this.stats.targetFrozenDamageMultiplier;
-		target.setHealth(target.health - damage);
+			targetDamage *= this.stats.targetFrozenDamageMultiplier;
+		target.setHealth(target.health - targetDamage);
 		if (target.health === 0)
-			await target.die();
+			deaths.push(target.die());
+
+		for (const unit of allUnits) {
+			if (unit.health === 0)
+				continue;
+			if (!Object.is(unit, target))
+				unit.setHealth(unit.health - this.stats.damageAll);
+			if (unit.health === 0)
+				deaths.push(unit.die());
+		}
+		await Promise.all(deaths);
 	}
 
 	startCooldown() {

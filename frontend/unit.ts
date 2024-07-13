@@ -64,7 +64,7 @@ export class Unit extends Actor {
 		(this.healthBar.graphics.current as Rectangle).width = this.health / this.maxHP * this.barMaxWidth;
 	}
 
-	async resolveTurn(game: Engine, target: Unit) {
+	async resolveTurn(game: Engine, target: Unit, allUnits: Unit[]) {
 		if (this.health === 0 || this.resolveFreeze())
 			return;
 		let casted = false;
@@ -73,7 +73,7 @@ export class Unit extends Actor {
 				continue;
 			if (!casted && (spell.cooldown?.remaining ?? 0) == 0) {
 				slot.color = Color.Viridian;
-				await spell.cast(game, this, target);
+				await spell.cast(game, this, target, allUnits);
 				slot.color = SLOT_DEFAULT_COLOR;
 				casted = true;
 			} else
