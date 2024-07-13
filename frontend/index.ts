@@ -133,6 +133,8 @@ start.addEventListener('click', async () => {
 	if (gameState.simulating)
 		return;
 	start.disabled = gameState.simulating = true;
+	for (const spell of spells)
+		spell.startCooldown();
 
 	let playerTurn = true;
 	while ((blueWitch.health + redWitch.health) > 0 && enemy.health > 0) {
@@ -172,7 +174,7 @@ restart.addEventListener('click', () => {
 		unit.reset();
 
 	for (const spell of spells)
-		spell.resetCooldown();
+		spell.clearCooldown();
 	endText.text = '';
 	restart.style.display = 'none';
 	start.disabled = gameState.simulating = false;

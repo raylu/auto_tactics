@@ -154,19 +154,18 @@ class Spell {
 
 	decrementCooldown() {
 		if (this.cooldown !== null && this.cooldown.remaining > 0) {
-			if (this.cooldown.remaining === 1)
-				this.resetCooldown();
+			this.cooldown.remaining--;
+			if (this.cooldown.remaining === 0)
+				this.clearCooldown();
 			else {
-				this.cooldown.remaining--;
 				const cdLabel = this.icon.children[0] as Label;
 				cdLabel.text = String(this.cooldown.remaining);
 			}
 		}
 	}
 
-	resetCooldown() {
+	clearCooldown() {
 		if (this.cooldown !== null) {
-			this.cooldown.remaining = 0;
 			this.icon.removeAllChildren();
 		}
 	}
