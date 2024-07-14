@@ -133,8 +133,9 @@ start.addEventListener('click', async () => {
 	if (gameState.simulating)
 		return;
 	start.disabled = gameState.simulating = true;
-	for (const spell of spells)
-		spell.startCooldown();
+	for (const witch of playerUnits)
+		for (const {spell} of witch.spellSlots)
+			spell?.startCooldown();
 
 	let playerTurn = true;
 	while (!redWitch.isDead() || !blueWitch.isDead()) {
