@@ -4,16 +4,18 @@ import {SLOT_DEFAULT_COLOR, type SpellSlot} from './spells';
 import type {UnitAnimations} from './sprites';
 
 interface UnitConfig {
-	maxHP: number;
+	maxHP: number | null;
 	animations: UnitAnimations,
 	spellSlots: SpellSlot[];
 }
 
 export class Unit extends Actor {
-	maxHP: number;
-	health: number;
-	healthBar: Actor;
-	barMaxWidth: number;
+	readonly health: null | {
+		readonly maxHP: number;
+		readonly bar: Actor;
+		readonly barMaxWidth: number;
+	};
+	damageTaken: number;
 	freeze = 0;
 	animations: UnitAnimations;
 	spellSlots: SpellSlot[];
@@ -21,19 +23,26 @@ export class Unit extends Actor {
 	constructor(config: ActorArgs & {width: number, height: number}, unitConfig: UnitConfig) {
 		super(config);
 
-		this.maxHP = this.health = unitConfig.maxHP;
-		this.barMaxWidth = config.width - 1;
-		this.healthBar = new Actor({
-			width: this.barMaxWidth,
-			height: 5,
-			color: Color.Chartreuse,
-			pos: vec(-config.width / 2 + 1, -config.height / 2 - 6),
-			anchor: vec(0, 1),
-		});
-		this.healthBar.graphics.onPostDraw = (gfx: ExcaliburGraphicsContext) => {
-			gfx.drawRectangle(vec(0, -6), config.width, 7, Color.Transparent, Color.fromRGB(100, 200, 100), 1);
-		};
-		this.addChild(this.healthBar);
+		if (unitConfig.maxHP === null)
+			this.health = null;
+		else {
+			this.health = {
+				maxHP: unitConfig.maxHP,
+				barMaxWidth: config.width - 1,
+				bar: new Actor({
+					width: config.width - 1,
+					height: 5,
+					color: Color.Chartreuse,
+					pos: vec(-config.width / 2 + 1, -config.height / 2 - 6),
+					anchor: vec(0, 1),
+				}),
+			};
+			this.health.bar.graphics.onPostDraw = (gfx: ExcaliburGraphicsContext) => {
+				gfx.drawRectangle(vec(0, -6), config.width, 7, Color.Transparent, Color.fromRGB(100, 200, 100), 1);
+			};
+			this.addChild(this.health.bar);
+		}
+		this.damageTaken = 0;
 
 		this.animations = unitConfig.animations;
 		this.graphics.use(unitConfig.animations.idle);
@@ -59,13 +68,20 @@ export class Unit extends Actor {
 		Debug.drawBounds(this.collider.bounds, {color: Color.Yellow});
 	}
 
-	setHealth(health: number) {
-		this.health = Math.max(health, 0);
-		(this.healthBar.graphics.current as Rectangle).width = this.health / this.maxHP * this.barMaxWidth;
+	takeDamage(damage: number) {
+		this.damageTaken += damage;
+		if (this.health !== null) {
+			const hp = Math.max(this.health.maxHP - this.damageTaken, 0);
+			(this.health.bar.graphics.current as Rectangle).width = hp / this.health.maxHP * this.health.barMaxWidth;
+		}
+	}
+
+	isDead() {
+		return this.health !== null && this.damageTaken >= this.health.maxHP;
 	}
 
 	async resolveTurn(game: Engine, target: Unit, allUnits: Unit[]) {
-		if (this.health === 0 || this.resolveFreeze())
+		if (this.isDead() || this.resolveFreeze())
 			return;
 		let casted = false;
 		for (const {spell, slot} of this.spellSlots) {
@@ -102,7 +118,8 @@ export class Unit extends Actor {
 	}
 
 	reset() {
-		this.setHealth(this.maxHP);
+		this.damageTaken = 0;
+		this.takeDamage(0);
 		this.freeze = 0;
 		this.unfreeze();
 		this.graphics.use(this.animations.idle);

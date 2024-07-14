@@ -124,16 +124,16 @@ class Spell {
 		let targetDamage = this.stats.damage + this.stats.damageAll;
 		if (target.freeze > 100)
 			targetDamage *= this.stats.targetFrozenDamageMultiplier;
-		target.setHealth(target.health - targetDamage);
-		if (target.health === 0)
+		target.takeDamage(targetDamage);
+		if (target.isDead()) // no longer possible now that enemy has null health
 			deaths.push(target.die());
 
 		for (const unit of allUnits) {
-			if (unit.health === 0)
+			if (unit.isDead())
 				continue;
 			if (!Object.is(unit, target))
-				unit.setHealth(unit.health - this.stats.damageAll);
-			if (unit.health === 0)
+				unit.takeDamage(this.stats.damageAll);
+			if (unit.isDead())
 				deaths.push(unit.die());
 		}
 		await Promise.all(deaths);

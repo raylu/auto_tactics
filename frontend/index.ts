@@ -70,7 +70,7 @@ const enemy = new Unit({
 	width: 22,
 	height: 36,
 }, {
-	maxHP: 100,
+	maxHP: null,
 	animations: {...enemyAnims, charge: enemyAnims.idle, takeDamage: enemyAnims.idle},
 	spellSlots: [],
 });
@@ -92,8 +92,8 @@ function enemyAttack(target: Unit): Promise<void> {
 		.moveTo(ENEMY_START, 2000)
 		.callMethod(() => {
 			enemy.graphics.use(enemyAnims.idle);
-			target.setHealth(target.health - 10);
-			if (target.health === 0)
+			target.takeDamage(10);
+			if (target.isDead())
 				void target.die().then(resolve);
 			else
 				resolve();
@@ -137,17 +137,14 @@ start.addEventListener('click', async () => {
 		spell.startCooldown();
 
 	let playerTurn = true;
-	while ((blueWitch.health + redWitch.health) > 0 && enemy.health > 0) {
+	while (!redWitch.isDead() || !blueWitch.isDead()) {
 		if (playerTurn)
-			for (const witch of playerUnits) {
+			for (const witch of playerUnits)
 				await witch.resolveTurn(game, enemy, allUnits);
-				if (enemy.health === 0)
-					break;
-			}
 		else {
 			if (!enemy.resolveFreeze())
 				for (const witch of playerUnits)
-					if (witch.health > 0) {
+					if (!witch.isDead()) {
 						await enemyAttack(witch);
 						break;
 					}
