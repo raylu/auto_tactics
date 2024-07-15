@@ -1,6 +1,7 @@
 import {Color, DisplayMode, Engine, Font, Label, Random, TextAlign, TileMap, vec} from 'excalibur';
 
 import {loader} from './loader';
+import {ScoreDisplay} from './score_display';
 import {sndPlugin} from './sounds';
 import {initSpells, spellSlots, spells} from './spells';
 import {blueWitchAnims, enemyAnims, redWitchAnims, terrainGrass} from './sprites';
@@ -101,11 +102,7 @@ function enemyAttack(target: Unit): Promise<void> {
 }
 const allUnits = [...playerUnits, enemy];
 
-const scoreDisplay = new Label({
-	pos: vec(game.drawWidth - 12, 10),
-	font: new Font({family: 'Metrophobic', size: 24, textAlign: TextAlign.Right}),
-});
-game.add(scoreDisplay);
+const scoreDisplay = new ScoreDisplay(game);
 const endText = new Label({
 	pos: vec(game.drawWidth / 2, game.drawHeight / 2 - 50),
 	font: new Font({
@@ -137,12 +134,13 @@ start.addEventListener('click', async () => {
 
 	let playerTurn = true;
 	while (!redWitch.isDead() || !blueWitch.isDead()) {
-		if (playerTurn) {
-			let turnDamage = 0;
-			for (const witch of playerUnits)
-				turnDamage += await witch.resolveTurn(game, enemy, allUnits);
-			scoreDisplay.text = String(turnDamage);
-		} else {
+		if (playerTurn)
+			for (const witch of playerUnits) {
+				const damage = await witch.resolveTurn(game, enemy, allUnits);
+				if (damage > 0)
+					scoreDisplay.add(damage);
+			}
+		else {
 			if (!enemy.resolveFreeze())
 				for (const witch of playerUnits)
 					if (!witch.isDead()) {
@@ -171,7 +169,7 @@ restart.addEventListener('click', () => {
 		spell.clearCooldown();
 	endText.text = '';
 	restart.style.display = 'none';
-	scoreDisplay.text = '';
+	scoreDisplay.clear();
 	start.disabled = gameState.simulating = false;
 });
 
