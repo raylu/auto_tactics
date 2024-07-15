@@ -114,7 +114,7 @@ class Spell {
 		this.icon.pos = spellSlot.slot.pos.clone();
 	}
 
-	async cast(game: Engine, caster: Unit, target: Unit, allUnits: Unit[]) {
+	async cast(game: Engine, caster: Unit, target: Unit, allUnits: Unit[]): Promise<number> {
 		this.startCooldown();
 		await this.castFn(game, caster, target);
 
@@ -137,6 +137,8 @@ class Spell {
 				deaths.push(unit.die());
 		}
 		await Promise.all(deaths);
+
+		return targetDamage;
 	}
 
 	startCooldown() {

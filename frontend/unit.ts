@@ -80,21 +80,23 @@ export class Unit extends Actor {
 		return this.health !== null && this.damageTaken >= this.health.maxHP;
 	}
 
-	async resolveTurn(game: Engine, target: Unit, allUnits: Unit[]) {
+	async resolveTurn(game: Engine, target: Unit, allUnits: Unit[]): Promise<number> {
 		if (this.isDead() || this.resolveFreeze())
-			return;
+			return 0;
 		let casted = false;
+		let damageDealt = 0;
 		for (const {spell, slot} of this.spellSlots) {
 			if (spell === null)
 				continue;
 			if (!casted && (spell.cooldown?.remaining ?? 0) == 0) {
 				slot.color = Color.Viridian;
-				await spell.cast(game, this, target, allUnits);
+				damageDealt = await spell.cast(game, this, target, allUnits);
 				slot.color = SLOT_DEFAULT_COLOR;
 				casted = true;
 			} else
 				spell.decrementCooldown();
 		}
+		return damageDealt;
 	}
 
 	resolveFreeze(): boolean {
