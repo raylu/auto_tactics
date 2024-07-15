@@ -1,4 +1,4 @@
-import {Color, DisplayMode, Engine, Font, Label, Random, TextAlign, TileMap, vec} from 'excalibur';
+import {Color, DisplayMode, Engine, Random, TileMap, vec} from 'excalibur';
 
 import {loader} from './loader';
 import {ScoreDisplay} from './score_display';
@@ -103,17 +103,6 @@ function enemyAttack(target: Unit): Promise<void> {
 const allUnits = [...playerUnits, enemy];
 
 const scoreDisplay = new ScoreDisplay(game);
-const endText = new Label({
-	pos: vec(game.drawWidth / 2, game.drawHeight / 2 - 50),
-	font: new Font({
-		family: 'Metrophobic',
-		bold: true,
-		size: 48,
-		textAlign: TextAlign.Center,
-		shadow: {offset: vec(1, 1), color: Color.Black},
-	}),
-});
-game.add(endText);
 
 initSpells(game);
 
@@ -151,13 +140,7 @@ start.addEventListener('click', async () => {
 		playerTurn = !playerTurn;
 	}
 
-	if (enemy.health === 0) {
-		endText.text = 'victory!';
-		endText.font.color = Color.fromRGB(96, 255, 128);
-	} else {
-		endText.text = 'defeat';
-		endText.font.color = Color.fromRGB(255, 96, 128);
-	}
+	scoreDisplay.center();
 	restart.style.display = 'block';
 });
 
@@ -167,7 +150,6 @@ restart.addEventListener('click', () => {
 
 	for (const spell of spells)
 		spell.clearCooldown();
-	endText.text = '';
 	restart.style.display = 'none';
 	scoreDisplay.clear();
 	start.disabled = gameState.simulating = false;

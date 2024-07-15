@@ -1,10 +1,11 @@
-import {type Action, Color, EaseTo, EasingFunctions, type Engine, Fade, Font, Label, MoveTo, ParallelActions, TextAlign, type Vector,
-	coroutine, vec} from 'excalibur';
+import {type Action, Color, EaseTo, EasingFunctions, type Engine, Fade, Font, Label, ParallelActions, TextAlign,
+	type Vector, coroutine, vec} from 'excalibur';
 
 export class ScoreDisplay {
 	readonly game: Engine;
 	total: number;
 	readonly totalDisplay: Label;
+	readonly totalStart: Vector;
 	readonly incremental: Label;
 	readonly incrementalStart: Vector;
 	readonly consolidateIncremental: Action;
@@ -13,16 +14,19 @@ export class ScoreDisplay {
 		this.game = game;
 
 		this.total = 0;
+		this.totalStart = vec(game.drawWidth - 12, 10);
 		this.totalDisplay = new Label({
-			pos: vec(game.drawWidth - 12, 10),
-			font: new Font({family: 'Metrophobic', size: 36, color: Color.fromRGB(255, 96, 128), textAlign: TextAlign.Right}),
+			pos: this.totalStart.clone(),
+			font: new Font({family: 'Metrophobic', size: 36, textAlign: TextAlign.Right,
+				color: Color.fromRGB(255, 96, 128), shadow: {offset: vec(1, 1), color: Color.Black}}),
 		});
 		game.add(this.totalDisplay);
 
 		this.incrementalStart = vec(game.drawWidth / 2, 16);
 		this.incremental = new Label({
 			pos: this.incrementalStart.clone(),
-			font: new Font({family: 'Metrophobic', size: 24, textAlign: TextAlign.Center}),
+			font: new Font({family: 'Metrophobic', size: 24, textAlign: TextAlign.Center,
+				shadow: {offset: vec(1, 1), color: Color.Gray}}),
 		});
 		game.add(this.incremental);
 		this.consolidateIncremental = new ParallelActions([
@@ -52,8 +56,14 @@ export class ScoreDisplay {
 		});
 	}
 
+	center() {
+		const width = this.totalDisplay.font.measureText(this.totalDisplay.text).width;
+		this.totalDisplay.actions.easeTo(vec(this.game.drawWidth / 2 + width / 2, 250), 1000, EasingFunctions.EaseOutQuad);
+	}
+
 	clear() {
 		this.total = 0;
 		this.totalDisplay.text = '';
+		this.totalDisplay.pos = this.totalStart.clone();
 	}
 }
