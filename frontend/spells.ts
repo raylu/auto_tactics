@@ -2,7 +2,8 @@ import {Actor, BaseAlign, Color, type Engine, Font, type Graphic, Label, type Po
 	type Vector, range, vec} from 'excalibur';
 
 import {fireExplosion, fireHold, fireSound, iceSound, sndPlugin} from './sounds';
-import {armageddonAnims, blueWitchIconImg, fireballAnims, iceBlastAnims, iceNovaAnims, redWitchIconImg, spellIcons} from './sprites';
+import {armageddonAnims, blueWitchIconImg, fireballAnims, iceBlastAnims, iceNovaAnims, redWitchIconImg, spellIcons,
+	whiteWitchIconImg} from './sprites';
 import {gameState} from './state';
 import type {Unit} from './unit';
 
@@ -316,12 +317,13 @@ export const spellSlots = {
 	bar: [] as SpellSlot[],
 	blueWitch: [] as SpellSlot[],
 	redWitch: [] as SpellSlot[],
+	whiteWitch: [] as SpellSlot[],
 } as const;
 
 export const SLOT_DEFAULT_COLOR = Color.fromRGB(92, 97, 128);
 
 export function initSpells(game: Engine) {
-	const spellBarPos = vec(275, game.drawHeight - 150);
+	const spellBarPos = vec(350, game.drawHeight - 165);
 	game.add(new ScreenElement({ // spell bar background
 		color: Color.fromRGB(0, 0, 0),
 		height: 40,
@@ -346,8 +348,9 @@ export function initSpells(game: Engine) {
 		game.add(spell.icon);
 	});
 
-	spellSlots.blueWitch.push(...witchSpellSlots(game, blueWitchIconImg.toSprite(), vec(40, game.drawHeight - 140)));
-	spellSlots.redWitch.push(...witchSpellSlots(game, redWitchIconImg.toSprite(), vec(40, game.drawHeight - 70)));
+	spellSlots.blueWitch.push(...witchSpellSlots(game, blueWitchIconImg.toSprite(), vec(40, game.drawHeight - 200)));
+	spellSlots.redWitch.push(...witchSpellSlots(game, redWitchIconImg.toSprite(), vec(40, game.drawHeight - 125)));
+	spellSlots.whiteWitch.push(...witchSpellSlots(game, whiteWitchIconImg.toSprite(), vec(40, game.drawHeight - 50)));
 
 	let draggedSpell: Spell | null = null;
 	game.input.pointers.primary.on('down', (event: PointerEvent) => {

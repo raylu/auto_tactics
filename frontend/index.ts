@@ -4,7 +4,7 @@ import {loader} from './loader';
 import {ScoreDisplay} from './score_display';
 import {sndPlugin} from './sounds';
 import {initSpells, spellSlots, spells} from './spells';
-import {blueWitchAnims, enemyAnims, redWitchAnims, terrainGrass} from './sprites';
+import {blueWitchAnims, enemyAnims, redWitchAnims, terrainGrass, whiteWitchAnims} from './sprites';
 import {gameState} from './state';
 import {Unit} from './unit';
 
@@ -20,7 +20,7 @@ const game = new Engine({
 
 const referenceGrassSprite = terrainGrass.getSprite(0, 0);
 const background = new TileMap({
-	rows: 448 / referenceGrassSprite.height,
+	rows: 384 / referenceGrassSprite.height,
 	columns: game.drawWidth / referenceGrassSprite.width,
 	tileHeight: referenceGrassSprite.height,
 	tileWidth: referenceGrassSprite.width,
@@ -31,7 +31,7 @@ for (const tile of background.tiles)
 game.add(background);
 
 const blueWitch = new Unit({
-	pos: vec(100, 150),
+	pos: vec(100, 100),
 	offset: vec(1, 0),
 	scale: vec(1.5, 1.5),
 	height: 40,
@@ -44,7 +44,7 @@ const blueWitch = new Unit({
 game.add(blueWitch);
 
 const redWitch = new Unit({
-	pos: vec(100, 300),
+	pos: vec(100, 200),
 	offset: vec(0, 2),
 	scale: vec(1.5, 1.5),
 	height: 48,
@@ -56,7 +56,21 @@ const redWitch = new Unit({
 });
 game.add(redWitch);
 
-const playerUnits = [blueWitch, redWitch];
+const whiteWitch = new Unit({
+	pos: vec(100, 300),
+	offset: vec(6, -5),
+	anchor: vec(0.5, 0.5),
+	scale: vec(1.5, 1.5),
+	height: 48,
+	width: 32,
+}, {
+	maxHP: 40,
+	animations: whiteWitchAnims,
+	spellSlots: spellSlots.whiteWitch,
+});
+game.add(whiteWitch);
+
+const playerUnits = [blueWitch, redWitch, whiteWitch];
 for (const witch of playerUnits)
 	witch.animations.takeDamage.events.on('end', () => {
 		witch.graphics.use(witch.animations.idle);
@@ -122,7 +136,7 @@ start.addEventListener('click', async () => {
 			spell?.startCooldown();
 
 	let playerTurn = true;
-	while (!redWitch.isDead() || !blueWitch.isDead()) {
+	while (!playerUnits.every(witch => witch.isDead())) {
 		if (playerTurn)
 			for (const witch of playerUnits) {
 				const damage = await witch.resolveTurn(game, enemy, allUnits);

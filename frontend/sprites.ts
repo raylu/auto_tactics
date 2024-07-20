@@ -38,6 +38,13 @@ export const redWitchAnims: UnitAnimations = {
 	death: witchAnimation('red_witch/death', 14, 56, 64, 0, AnimationStrategy.Freeze),
 } as const;
 export const redWitchIconImg = new ImageSource('static/sprites/red_witch/icon.gif');
+export const whiteWitchAnims: UnitAnimations = {
+	idle: witchAnimation('white_witch/idle', 6, 64, 64),
+	charge: witchAnimation('white_witch/charge', 8, 64, 64),
+	takeDamage: witchAnimation('white_witch/take_damage', 3, 64, 64, 0, AnimationStrategy.Freeze),
+	death: witchAnimation('white_witch/death', 11, 64, 64, 0, AnimationStrategy.Freeze),
+} as const;
+export const whiteWitchIconImg = new ImageSource('static/sprites/white_witch/icon.gif');
 
 const enemyImg = new ImageSource('static/sprites/enemy.png');
 const enemySprites = SpriteSheet.fromImageSource({
@@ -157,6 +164,6 @@ export const armageddonAnims = {
 	}), range(0, 17), 100, AnimationStrategy.Freeze),
 };
 
-loader.addResources([...resources, blueWitchIconImg, redWitchIconImg, enemyImg, terrainGrassImg, spellIconsImg,
-	iceBlastProjectileImg, iceBlastImpactImg, iceNovaVortexImg, iceNovaEndImg, fireballImg, armageddonBeamImg,
-	armageddonExplosionImg]);
+loader.addResources([...resources, blueWitchIconImg, redWitchIconImg, whiteWitchIconImg, enemyImg, terrainGrassImg,
+	spellIconsImg, iceBlastProjectileImg, iceBlastImpactImg, iceNovaVortexImg, iceNovaEndImg, fireballImg,
+	armageddonBeamImg, armageddonExplosionImg]);
