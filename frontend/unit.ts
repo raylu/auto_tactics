@@ -26,19 +26,20 @@ export class Unit extends Actor {
 		if (unitConfig.maxHP === null)
 			this.health = null;
 		else {
+			const barMaxWidth = unitConfig.maxHP * 0.8;
 			this.health = {
 				maxHP: unitConfig.maxHP,
-				barMaxWidth: config.width - 1,
+				barMaxWidth,
 				bar: new Actor({
-					width: config.width - 1,
+					width: barMaxWidth,
 					height: 5,
 					color: Color.Chartreuse,
-					pos: vec(-config.width / 2 + 1, -config.height / 2 - 6),
+					pos: vec(-barMaxWidth / 2 + 1, -config.height / 2 - 6),
 					anchor: vec(0, 1),
 				}),
 			};
 			this.health.bar.graphics.onPostDraw = (gfx: ExcaliburGraphicsContext) => {
-				gfx.drawRectangle(vec(0, -6), config.width, 7, Color.Transparent, Color.fromRGB(100, 200, 100), 1);
+				gfx.drawRectangle(vec(0, -6), barMaxWidth, 7, Color.Transparent, Color.fromRGB(100, 200, 100), 1);
 			};
 			this.addChild(this.health.bar);
 		}

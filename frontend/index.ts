@@ -31,7 +31,7 @@ for (const tile of background.tiles)
 game.add(background);
 
 const blueWitch = new Unit({
-	pos: vec(100, 100),
+	pos: vec(100, 80),
 	offset: vec(1, 0),
 	scale: vec(1.5, 1.5),
 	height: 40,
@@ -57,7 +57,7 @@ const redWitch = new Unit({
 game.add(redWitch);
 
 const whiteWitch = new Unit({
-	pos: vec(100, 300),
+	pos: vec(100, 320),
 	offset: vec(6, -5),
 	anchor: vec(0.5, 0.5),
 	scale: vec(1.5, 1.5),
