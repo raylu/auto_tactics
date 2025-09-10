@@ -126,7 +126,7 @@ game.on('initialize', () => {
 	start.style.display = 'block';
 });
 
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
+// oxlint-disable-next-line @typescript-eslint/no-misused-promises
 start.addEventListener('click', async () => {
 	if (gameState.simulating)
 		return;

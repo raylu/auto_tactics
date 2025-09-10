@@ -1,0 +1,48 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"plugins": [
+		"typescript"
+	],
+	"categories": {
+		"correctness": "error",
+		"suspicious": "warn",
+		"nursery": "warn",
+	},
+	"ignorePatterns": [
+		"static/*"
+	],
+	"rules": {
+		"no-unused-vars": ["error", {"args": "none"}],
+		"sort-imports": ["error", {"ignoreDeclarationSort": true}],
+		"@typescript-eslint/ban-ts-comment": "off",
+		"@typescript-eslint/no-explicit-any": "off",
+		"@typescript-eslint/no-floating-promises": ["error", {"ignoreIIFE": true}],
+		"@typescript-eslint/no-unsafe-argument": "off",
+		"@typescript-eslint/no-unsafe-assignment": "off",
+		"@typescript-eslint/no-unsafe-member-access": "off",
+		"@typescript-eslint/unbound-method": "off",
+	},
+	"overrides": [
+		{
+			"files": ["frontend/**/*"],
+			"env": {
+				"browser": true,
+			},
+		},
+		{
+			"files": ["shared/**/*"],
+			"env": {
+				"shared-node-browser": true,
+			},
+		},
+		{
+			"files": ["auto_tactics.ts"],
+			"env": {
+				"node": true,
+			},
+			"globals": {
+				"Bun": "readonly",
+			},
+		},
+	],
+}
