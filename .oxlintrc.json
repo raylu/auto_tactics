@@ -14,13 +14,7 @@
 	"rules": {
 		"no-unused-vars": ["error", {"args": "none"}],
 		"sort-imports": ["error", {"ignoreDeclarationSort": true}],
-		"@typescript-eslint/ban-ts-comment": "off",
-		"@typescript-eslint/no-explicit-any": "off",
-		"@typescript-eslint/no-floating-promises": ["error", {"ignoreIIFE": true}],
-		"@typescript-eslint/no-unsafe-argument": "off",
-		"@typescript-eslint/no-unsafe-assignment": "off",
-		"@typescript-eslint/no-unsafe-member-access": "off",
-		"@typescript-eslint/unbound-method": "off",
+		"typescript/no-floating-promises": ["error", {"ignoreIIFE": true}],
 	},
 	"overrides": [
 		{
